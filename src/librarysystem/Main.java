@@ -30,4 +30,5 @@ public class Main {
 			int frameWidth = f.getSize().width;
 			f.setLocation(((width - frameWidth) / 2), (height - frameHeight) / 3);
 		}
+		//test commit
 }
