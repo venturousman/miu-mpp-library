@@ -90,21 +90,14 @@ public class NewBookWindow extends JFrame implements LibWindow {
         leftPanel.add(bookISBNTextField);
 
         JLabel checkoutLengthLabel = new JLabel("Checkout Length");
-        checkoutLengthTextField = new JTextField();
+        checkoutLengthTextField = new JTextField("21");
         // Add a KeyListener to restrict input to digits and a minus sign
         checkoutLengthTextField.addKeyListener(new KeyAdapter() {
             @Override
             public void keyTyped(KeyEvent e) {
                 char ch = e.getKeyChar();
-
-                // Allow only digits and one minus sign at the start
-                if (!Character.isDigit(ch) && ch != '-') {
+                if (!Character.isDigit(ch)) {
                     e.consume();  // Ignore invalid input
-                }
-
-                // Only allow minus sign if it's at the beginning
-                if (ch == '-' && checkoutLengthTextField.getCaretPosition() != 0) {
-                    e.consume();
                 }
             }
         });
@@ -199,6 +192,7 @@ public class NewBookWindow extends JFrame implements LibWindow {
         btn.addActionListener(evt -> {
             bookISBNTextField.setText("");
             bookTitleTextField.setText("");
+            checkoutLengthTextField.setText(""); // "21"
         });
     }
 
@@ -223,12 +217,20 @@ public class NewBookWindow extends JFrame implements LibWindow {
             }
 
             // validate checkoutLength field is required and numeric
-            String checkoutLength = checkoutLengthTextField.getText().trim();
-            if (checkoutLength.isEmpty() || Util.isNumeric(checkoutLength)) {
+            String inputCheckoutLength = checkoutLengthTextField.getText().trim();
+            if (inputCheckoutLength.isEmpty() || !Util.isNumeric(inputCheckoutLength)) {
                 checkoutLengthTextField.setBorder(redBorder);
                 isValid = false;
             } else {
-                checkoutLengthTextField.setBorder(defaultBorder);
+//                checkoutLengthTextField.setBorder(defaultBorder);
+                // validate checkoutLength field is less than 21 days
+                int checkoutLength = Integer.parseInt(inputCheckoutLength);
+                if (checkoutLength < 1 || checkoutLength > 21) {
+                    checkoutLengthTextField.setBorder(redBorder);
+                    isValid = false;
+                } else {
+                    checkoutLengthTextField.setBorder(defaultBorder);
+                }
             }
 
             if (isValid) {
