@@ -5,6 +5,8 @@ import business.Book;
 import business.BookController;
 
 import javax.swing.*;
+import javax.swing.border.Border;
+import javax.swing.border.LineBorder;
 import javax.swing.table.DefaultTableModel;
 import java.awt.*;
 import java.awt.event.MouseAdapter;
@@ -32,6 +34,14 @@ public class NewBookWindow extends JFrame implements LibWindow {
 
     private JButton addBookButton;
     private JButton clearFormButton;
+
+    // Create the red border for invalid input
+    private final Border redBorder = new LineBorder(Color.RED, 2);
+    // Create the default border to reset later
+    private Border defaultBorder;
+    private final String[] columnNames = {
+            "ISBN", "Book Title", "Checkout Length", "Copies No.", "Author(s)"
+    };
 
     private NewBookWindow() {
     }
@@ -69,6 +79,8 @@ public class NewBookWindow extends JFrame implements LibWindow {
         bookTitleTextField.setPreferredSize(new Dimension(250, 30));
         leftPanel.add(titleLabel);
         leftPanel.add(bookTitleTextField);
+
+        defaultBorder = bookTitleTextField.getBorder();
 
         JLabel isbnLabel = new JLabel("Book ISBN");
         bookISBNTextField = new JTextField();
@@ -138,42 +150,22 @@ public class NewBookWindow extends JFrame implements LibWindow {
     }
 
     private void loadBooksToTable() {
-        String[] columnNames = {"ISBN", "Book Title", "Checkout Length", "Copies No.", "Author(s)"};
 
         // load data
         Collection<Book> books = controller.getBooks();
 //        System.out.println(books);
-//        DefaultTableModel tableModel = new DefaultTableModel();
-//        tableModel.setColumnIdentifiers(columnNames);
 
         Object[][] items = new Object[books.size()][];
 
         int i = 0;
         for (Book book : books) {
-            List<Author> authors = book.getAuthors();
-            // Using Stream to filter and sort names
-            List<String> authorNames = authors.stream()
-                    .map(Author::getFullName)  // Extract names
-                    .sorted()                  // Sorting alphabetically
-                    .toList();                 // Collecting results to a list
-            String authorName = String.join(",", authorNames);
-
-//            tableModel.addRow(new Object[]{
-//                    book.getIsbn(),
-//                    book.getTitle(),
-//                    book.getMaxCheckoutLength(),
-//                    book.getNumCopies(),
-//                    authorName
-//            });
-
             Object[] item = new Object[]{
                     book.getIsbn(),
                     book.getTitle(),
                     book.getMaxCheckoutLength(),
                     book.getNumCopies(),
-                    authorName,
+                    book.getAuthorNames(),
             };
-//            items.add(item);
             items[i++] = item;
         }
 

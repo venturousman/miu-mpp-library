@@ -92,6 +92,16 @@ final public class Book implements Serializable {
         return authors;
     }
 
+    public String getAuthorNames() {
+        if (authors == null || authors.isEmpty()) return null;
+        // Using Stream to filter and sort names
+        List<String> authorNames = authors.stream()
+                .map(Author::getFullName)  // Extract names
+                .sorted()                  // Sorting alphabetically
+                .toList();                 // Collecting results to a list
+        return String.join(",", authorNames);
+    }
+
     public String getIsbn() {
         return isbn;
     }
