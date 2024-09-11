@@ -62,7 +62,6 @@ final public class Book implements Serializable {
         return b.isbn.equals(isbn);
     }
 
-
     public boolean isAvailable() {
         if (copies == null) {
             return false;

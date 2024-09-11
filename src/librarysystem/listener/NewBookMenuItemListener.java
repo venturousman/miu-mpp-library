@@ -13,7 +13,7 @@ public class NewBookMenuItemListener implements ActionListener {
     public void actionPerformed(ActionEvent e) {
         LibrarySystem.hideAllWindows();
         NewBookWindow.INSTANCE.init();
-        NewBookWindow.INSTANCE.setSize(800, 600);
+        NewBookWindow.INSTANCE.setSize(1200, 600);
         Util.centerFrameOnDesktop(NewBookWindow.INSTANCE);
         NewBookWindow.INSTANCE.setVisible(true);
         NewBookWindow.INSTANCE.setTitle("New Book Window");

@@ -1,16 +1,27 @@
 package librarysystem;
 
+import business.Author;
+import business.Book;
+import business.BookController;
+
 import javax.swing.*;
+import javax.swing.table.DefaultTableModel;
 import javax.swing.text.NumberFormatter;
 import java.awt.*;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.text.NumberFormat;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.List;
+import java.util.stream.Collectors;
 
 public class NewBookWindow extends JFrame implements LibWindow {
 
     public static final NewBookWindow INSTANCE = new NewBookWindow();
     //    ControllerInterface ci = new SystemController();
+    BookController controller = new BookController();
+
     private boolean isInitialized = false;
     private JPanel mainPanel;
     private JPanel leftPanel;
@@ -106,6 +117,7 @@ public class NewBookWindow extends JFrame implements LibWindow {
 //        middlePanel.add(textArea);
 
         JScrollPane scrollPane = new JScrollPane();
+        scrollPane.setPreferredSize(new Dimension(800, 600));
 //        scrollPane.setBounds(6, 154, 582, 287);
         middlePanel.add(scrollPane);
 
@@ -119,13 +131,46 @@ public class NewBookWindow extends JFrame implements LibWindow {
 //                authtf.setText(model.getValueAt(r, 2).toString());
             }
         });
-        booksTable.setBackground(new Color(255, 240, 245));
-//        model = new DefaultTableModel();
-//        String[] column = {"ID","Book Name","Author"};
-//        String[] row = new String[3];
-//        model.setColumnIdentifiers(column);
-//        table.setModel(model);
+        booksTable.setBackground(new Color(255, 255, 255));
+//        booksTable.setPreferredSize(new Dimension(900, 600));
+//        DefaultTableModel tableModel = new DefaultTableModel();
+//        String[] columns = {"ISBN", "Book Title", "Checkout Length"};
+////        String[] row = new String[3];
+//        tableModel.setColumnIdentifiers(columns);
+//        booksTable.setModel(tableModel);
         scrollPane.setViewportView(booksTable);
+
+        // load data
+        loadBooksToTable();
+    }
+
+    private void loadBooksToTable() {
+        // load data
+        Collection<Book> books = controller.getBooks();
+//        System.out.println(books);
+        DefaultTableModel tableModel = new DefaultTableModel();
+        String[] columns = {"ISBN", "Book Title", "Checkout Length", "Copies No.", "Author(s)"};
+        tableModel.setColumnIdentifiers(columns);
+
+        for (Book book : books) {
+            List<Author> authors = book.getAuthors();
+            // Using Stream to filter and sort names
+            List<String> authorNames = authors.stream()
+                    .map(Author::getFullName)  // Extract names
+                    .sorted()                  // Sorting alphabetically
+                    .toList();                 // Collecting results to a list
+            String authorName = String.join(",", authorNames);
+
+            tableModel.addRow(new Object[]{
+                    book.getIsbn(),
+                    book.getTitle(),
+                    book.getMaxCheckoutLength(),
+                    book.getNumCopies(),
+                    authorName
+            });
+        }
+
+        booksTable.setModel(tableModel);
     }
 
     private void addBackButtonListener(JButton btn) {
