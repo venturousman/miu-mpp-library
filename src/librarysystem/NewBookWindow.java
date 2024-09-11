@@ -6,15 +6,12 @@ import business.BookController;
 
 import javax.swing.*;
 import javax.swing.table.DefaultTableModel;
-import javax.swing.text.NumberFormatter;
 import java.awt.*;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
-import java.text.NumberFormat;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
-import java.util.stream.Collectors;
 
 public class NewBookWindow extends JFrame implements LibWindow {
 
@@ -102,10 +99,11 @@ public class NewBookWindow extends JFrame implements LibWindow {
         leftPanel.add(addBookButton);
 
         clearFormButton = new JButton("Clear");
+        registerClearButtonListener(clearFormButton);
         leftPanel.add(clearFormButton);
 
         JButton backButton = new JButton("Back");
-        addBackButtonListener(backButton);
+        registerBackButtonListener(backButton);
         leftPanel.add(backButton);
     }
 
@@ -133,11 +131,6 @@ public class NewBookWindow extends JFrame implements LibWindow {
         });
         booksTable.setBackground(new Color(255, 255, 255));
 //        booksTable.setPreferredSize(new Dimension(900, 600));
-//        DefaultTableModel tableModel = new DefaultTableModel();
-//        String[] columns = {"ISBN", "Book Title", "Checkout Length"};
-////        String[] row = new String[3];
-//        tableModel.setColumnIdentifiers(columns);
-//        booksTable.setModel(tableModel);
         scrollPane.setViewportView(booksTable);
 
         // load data
@@ -145,13 +138,17 @@ public class NewBookWindow extends JFrame implements LibWindow {
     }
 
     private void loadBooksToTable() {
+        String[] columnNames = {"ISBN", "Book Title", "Checkout Length", "Copies No.", "Author(s)"};
+
         // load data
         Collection<Book> books = controller.getBooks();
 //        System.out.println(books);
-        DefaultTableModel tableModel = new DefaultTableModel();
-        String[] columns = {"ISBN", "Book Title", "Checkout Length", "Copies No.", "Author(s)"};
-        tableModel.setColumnIdentifiers(columns);
+//        DefaultTableModel tableModel = new DefaultTableModel();
+//        tableModel.setColumnIdentifiers(columnNames);
 
+        Object[][] items = new Object[books.size()][];
+
+        int i = 0;
         for (Book book : books) {
             List<Author> authors = book.getAuthors();
             // Using Stream to filter and sort names
@@ -161,22 +158,54 @@ public class NewBookWindow extends JFrame implements LibWindow {
                     .toList();                 // Collecting results to a list
             String authorName = String.join(",", authorNames);
 
-            tableModel.addRow(new Object[]{
+//            tableModel.addRow(new Object[]{
+//                    book.getIsbn(),
+//                    book.getTitle(),
+//                    book.getMaxCheckoutLength(),
+//                    book.getNumCopies(),
+//                    authorName
+//            });
+
+            Object[] item = new Object[]{
                     book.getIsbn(),
                     book.getTitle(),
                     book.getMaxCheckoutLength(),
                     book.getNumCopies(),
-                    authorName
-            });
+                    authorName,
+            };
+//            items.add(item);
+            items[i++] = item;
         }
+
+        // Creating a DefaultTableModel with isCellEditable() overridden to return false
+        DefaultTableModel tableModel = new DefaultTableModel(items, columnNames) {
+            @Override
+            public boolean isCellEditable(int row, int column) {
+                // All cells are not editable
+                return false;
+            }
+        };
 
         booksTable.setModel(tableModel);
     }
 
-    private void addBackButtonListener(JButton btn) {
+    private void registerBackButtonListener(JButton btn) {
         btn.addActionListener(evt -> {
             LibrarySystem.hideAllWindows();
             LibrarySystem.INSTANCE.setVisible(true);
+        });
+    }
+
+    private void registerClearButtonListener(JButton btn) {
+        btn.addActionListener(evt -> {
+            bookISBNTextField.setText("");
+            bookTitleTextField.setText("");
+        });
+    }
+
+    private void registerAddButtonListener(JButton btn) {
+        btn.addActionListener(evt -> {
+            // TODO
         });
     }
 
