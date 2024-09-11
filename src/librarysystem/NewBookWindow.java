@@ -69,7 +69,7 @@ public class NewBookWindow extends JFrame implements LibWindow {
 
     private void defineLeftPanel() {
         leftPanel = new JPanel();
-        leftPanel.setLayout(new FlowLayout(FlowLayout.LEFT));
+        leftPanel.setLayout(new FlowLayout(FlowLayout.LEFT, 20, 8));
 //        leftPanel.setLayout(new BoxLayout(leftPanel, BoxLayout.Y_AXIS));
         leftPanel.setPreferredSize(new Dimension(300, 600));
 
@@ -121,13 +121,13 @@ public class NewBookWindow extends JFrame implements LibWindow {
 
     private void defineMiddlePanel() {
         middlePanel = new JPanel();
-        FlowLayout fl = new FlowLayout(FlowLayout.CENTER, 25, 25);
+        FlowLayout fl = new FlowLayout(FlowLayout.CENTER, 0, 8);
         middlePanel.setLayout(fl);
 //        textArea = new TextArea(8, 20);
 //        middlePanel.add(textArea);
 
         JScrollPane scrollPane = new JScrollPane();
-        scrollPane.setPreferredSize(new Dimension(800, 600));
+        scrollPane.setPreferredSize(new Dimension(850, 540));
 //        scrollPane.setBounds(6, 154, 582, 287);
         middlePanel.add(scrollPane);
 
