@@ -9,6 +9,8 @@ import javax.swing.border.Border;
 import javax.swing.border.LineBorder;
 import javax.swing.table.DefaultTableModel;
 import java.awt.*;
+import java.awt.event.KeyAdapter;
+import java.awt.event.KeyEvent;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.util.ArrayList;
@@ -30,13 +32,12 @@ public class NewBookWindow extends JFrame implements LibWindow {
     private JTextField bookTitleTextField;
     private JTextField bookISBNTextField;
     private JTextField checkoutLengthTextField;
-//    private JFormattedTextField checkoutLengthFormattedTextField;
 
     private JButton addBookButton;
     private JButton clearFormButton;
 
     // Create the red border for invalid input
-    private final Border redBorder = new LineBorder(Color.RED, 2);
+    private final Border redBorder = new LineBorder(Color.RED, 1);
     // Create the default border to reset later
     private Border defaultBorder;
     private final String[] columnNames = {
@@ -88,26 +89,32 @@ public class NewBookWindow extends JFrame implements LibWindow {
         leftPanel.add(isbnLabel);
         leftPanel.add(bookISBNTextField);
 
-//        // Create a NumberFormat instance to ensure numeric input
-//        NumberFormat format = NumberFormat.getIntegerInstance();
-//        format.setGroupingUsed(false); // Disable grouping (e.g., no commas in large numbers)
-//
-//        // Create a NumberFormatter that will only allow numbers
-//        NumberFormatter formatter = new NumberFormatter(format);
-//        formatter.setValueClass(Integer.class); // Only allow integers
-//        formatter.setAllowsInvalid(false);      // Prevent invalid input
-//        formatter.setMinimum(1);                // Optionally set a minimum value
-
         JLabel checkoutLengthLabel = new JLabel("Checkout Length");
-//        checkoutLengthFormattedTextField = new JFormattedTextField(formatter);
-//        checkoutLengthFormattedTextField.setPreferredSize(new Dimension(250, 30));
         checkoutLengthTextField = new JTextField();
+        // Add a KeyListener to restrict input to digits and a minus sign
+        checkoutLengthTextField.addKeyListener(new KeyAdapter() {
+            @Override
+            public void keyTyped(KeyEvent e) {
+                char ch = e.getKeyChar();
+
+                // Allow only digits and one minus sign at the start
+                if (!Character.isDigit(ch) && ch != '-') {
+                    e.consume();  // Ignore invalid input
+                }
+
+                // Only allow minus sign if it's at the beginning
+                if (ch == '-' && checkoutLengthTextField.getCaretPosition() != 0) {
+                    e.consume();
+                }
+            }
+        });
         checkoutLengthTextField.setPreferredSize(new Dimension(250, 30));
         leftPanel.add(checkoutLengthLabel);
         leftPanel.add(checkoutLengthTextField);
 
         // buttons
         addBookButton = new JButton("Add");
+        registerAddButtonListener(addBookButton);
         leftPanel.add(addBookButton);
 
         clearFormButton = new JButton("Clear");
@@ -197,7 +204,36 @@ public class NewBookWindow extends JFrame implements LibWindow {
 
     private void registerAddButtonListener(JButton btn) {
         btn.addActionListener(evt -> {
-            // TODO
+            boolean isValid = true;
+
+            // validate title field is required
+            if (bookTitleTextField.getText().trim().isEmpty()) {
+                bookTitleTextField.setBorder(redBorder);
+                isValid = false;
+            } else {
+                bookTitleTextField.setBorder(defaultBorder);
+            }
+
+            // validate isbn field is required
+            if (bookISBNTextField.getText().trim().isEmpty()) {
+                bookISBNTextField.setBorder(redBorder);
+                isValid = false;
+            } else {
+                bookISBNTextField.setBorder(defaultBorder);
+            }
+
+            // validate checkoutLength field is required and numeric
+            String checkoutLength = checkoutLengthTextField.getText().trim();
+            if (checkoutLength.isEmpty() || Util.isNumeric(checkoutLength)) {
+                checkoutLengthTextField.setBorder(redBorder);
+                isValid = false;
+            } else {
+                checkoutLengthTextField.setBorder(defaultBorder);
+            }
+
+            if (isValid) {
+                // TODO save
+            }
         });
     }
 
