@@ -1,11 +1,10 @@
 package librarysystem;
 
 import java.awt.GridLayout;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
-import java.util.Collections;
-import java.util.List;
+import java.io.File;
+import java.io.IOException;
 
+import javax.imageio.ImageIO;
 import javax.swing.BorderFactory;
 import javax.swing.ImageIcon;
 import javax.swing.JFrame;
@@ -17,23 +16,31 @@ import javax.swing.JPanel;
 
 import business.ControllerInterface;
 import business.SystemController;
-
+import librarysystem.listener.*;
 
 public class LibrarySystem extends JFrame implements LibWindow {
     ControllerInterface ci = new SystemController();
     public final static LibrarySystem INSTANCE = new LibrarySystem();
     JPanel mainPanel;
     JMenuBar menuBar;
-    JMenu options;
-    JMenuItem login, allBookIds, allMemberIds;
-    String pathToImage;
+    JMenu accountMenu;
+    JMenuItem loginMenuItem, allBookIds, allMemberIds;
+    JMenu bookMenu, memberMenu, helpMenu;
+    JMenuItem newBookMenuItem, checkoutBookMenuItem, newBookCopyMenuItem;
+    JMenuItem newMemberMenuItem;
+    JMenuItem aboutMenuItem;
+    String pathToImage, pathToIcon;
     private boolean isInitialized = false;
 
-    private static LibWindow[] allWindows = {
+    private static final LibWindow[] allWindows = {
             LibrarySystem.INSTANCE,
             LoginWindow.INSTANCE,
             AllMemberIdsWindow.INSTANCE,
-            AllBookIdsWindow.INSTANCE
+            AllBookIdsWindow.INSTANCE,
+            NewMemberWindow.INSTANCE,
+            NewBookWindow.INSTANCE,
+            NewBookCopyWindow.INSTANCE,
+            CheckoutBookWindow.INSTANCE,
     };
 
     public static void hideAllWindows() {
@@ -47,8 +54,8 @@ public class LibrarySystem extends JFrame implements LibWindow {
 
     public void init() {
         formatContentPane();
-        setPathToImage();
-        insertSplashImage();
+        setImagePaths();
+        setImages();
 
         createMenus();
         //pack();
@@ -62,103 +69,76 @@ public class LibrarySystem extends JFrame implements LibWindow {
         getContentPane().add(mainPanel);
     }
 
-    private void setPathToImage() {
+    private void setImagePaths() {
         String currDirectory = System.getProperty("user.dir");
         pathToImage = currDirectory + "\\src\\librarysystem\\library.jpg";
+        pathToIcon = currDirectory + "\\src\\librarysystem\\icon.png";
     }
 
-    private void insertSplashImage() {
+    private void setImages() {
         ImageIcon image = new ImageIcon(pathToImage);
         mainPanel.add(new JLabel(image));
+
+        try {
+            setIconImage(ImageIO.read(new File(pathToIcon)));
+        } catch (IOException e) {
+            System.out.println(e.getMessage());
+//            throw new RuntimeException(e);
+        }
     }
 
     private void createMenus() {
         menuBar = new JMenuBar();
         menuBar.setBorder(BorderFactory.createRaisedBevelBorder());
-        addMenuItems();
+        addAccountMenu();
+        addBookMenu();
+        addMemberMenu();
+        addHelpMenu();
         setJMenuBar(menuBar);
     }
 
-    private void addMenuItems() {
-        options = new JMenu("Options");
-        menuBar.add(options);
-        login = new JMenuItem("Login");
-        login.addActionListener(new LoginListener());
-        allBookIds = new JMenuItem("All Book Ids");
-        allBookIds.addActionListener(new AllBookIdsListener());
-        allMemberIds = new JMenuItem("All Member Ids");
-        allMemberIds.addActionListener(new AllMemberIdsListener());
-        options.add(login);
-        options.add(allBookIds);
-        options.add(allMemberIds);
+    private void addAccountMenu() {
+        accountMenu = new JMenu("Account");
+        menuBar.add(accountMenu);
+        // items
+        loginMenuItem = new JMenuItem("Login");
+        loginMenuItem.addActionListener(new LoginMenuItemListener());
+        accountMenu.add(loginMenuItem);
     }
 
-    class LoginListener implements ActionListener {
+    private void addBookMenu() {
+        bookMenu = new JMenu("Book");
+        menuBar.add(bookMenu);
+        // items
+        newBookMenuItem = new JMenuItem("New Book");
+        newBookMenuItem.addActionListener(new NewBookMenuItemListener());
+        bookMenu.add(newBookMenuItem);
 
-        @Override
-        public void actionPerformed(ActionEvent e) {
-            LibrarySystem.hideAllWindows();
-            LoginWindow.INSTANCE.init();
-            Util.centerFrameOnDesktop(LoginWindow.INSTANCE);
-            LoginWindow.INSTANCE.setVisible(true);
+        newBookCopyMenuItem = new JMenuItem("New Book Copy");
+        newBookCopyMenuItem.addActionListener(new NewBookCopyMenuItemListener());
+        bookMenu.add(newBookCopyMenuItem);
 
-        }
-
+        checkoutBookMenuItem = new JMenuItem("Checkout Book(s)");
+        checkoutBookMenuItem.addActionListener(new CheckoutBookMenuItemListener());
+        bookMenu.add(checkoutBookMenuItem);
     }
 
-    class AllBookIdsListener implements ActionListener {
-
-        @Override
-        public void actionPerformed(ActionEvent e) {
-            LibrarySystem.hideAllWindows();
-            AllBookIdsWindow.INSTANCE.init();
-
-            List<String> ids = ci.allBookIds();
-            Collections.sort(ids);
-            StringBuilder sb = new StringBuilder();
-            for (String s : ids) {
-                sb.append(s + "\n");
-            }
-            System.out.println(sb.toString());
-            AllBookIdsWindow.INSTANCE.setData(sb.toString());
-            AllBookIdsWindow.INSTANCE.pack();
-            //AllBookIdsWindow.INSTANCE.setSize(660,500);
-            Util.centerFrameOnDesktop(AllBookIdsWindow.INSTANCE);
-            AllBookIdsWindow.INSTANCE.setVisible(true);
-
-        }
-
+    private void addMemberMenu() {
+        memberMenu = new JMenu("Member");
+        menuBar.add(memberMenu);
+        // items
+        newMemberMenuItem = new JMenuItem("New Member");
+        newMemberMenuItem.addActionListener(new NewMemberMenuItemListener());
+        memberMenu.add(newMemberMenuItem);
     }
 
-    class AllMemberIdsListener implements ActionListener {
-
-        @Override
-        public void actionPerformed(ActionEvent e) {
-            LibrarySystem.hideAllWindows();
-            AllMemberIdsWindow.INSTANCE.init();
-            AllMemberIdsWindow.INSTANCE.pack();
-            AllMemberIdsWindow.INSTANCE.setVisible(true);
-
-
-            LibrarySystem.hideAllWindows();
-            AllBookIdsWindow.INSTANCE.init();
-
-            List<String> ids = ci.allMemberIds();
-            Collections.sort(ids);
-            StringBuilder sb = new StringBuilder();
-            for (String s : ids) {
-                sb.append(s + "\n");
-            }
-            System.out.println(sb.toString());
-            AllMemberIdsWindow.INSTANCE.setData(sb.toString());
-            AllMemberIdsWindow.INSTANCE.pack();
-            //AllMemberIdsWindow.INSTANCE.setSize(660,500);
-            Util.centerFrameOnDesktop(AllMemberIdsWindow.INSTANCE);
-            AllMemberIdsWindow.INSTANCE.setVisible(true);
-
-
-        }
-
+    private void addHelpMenu() {
+        helpMenu = new JMenu("Help");
+        menuBar.add(helpMenu);
+        // items
+        aboutMenuItem = new JMenuItem("About");
+//        aboutMenuItem.addActionListener(new );
+        helpMenu.add(aboutMenuItem);
     }
 
     @Override
@@ -166,11 +146,8 @@ public class LibrarySystem extends JFrame implements LibWindow {
         return isInitialized;
     }
 
-
     @Override
     public void isInitialized(boolean val) {
         isInitialized = val;
-
     }
-
 }
