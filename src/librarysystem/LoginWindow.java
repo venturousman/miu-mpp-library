@@ -33,7 +33,7 @@ public class LoginWindow extends JFrame implements LibWindow {
 
     private JTextField usernameTextField;
     private JPasswordField passwordField;
-    private JButton loginButton;
+    private JButton loginButton, backButton;
 //    private JButton logoutButton;
 
     // Create the red border for invalid input
@@ -102,7 +102,7 @@ public class LoginWindow extends JFrame implements LibWindow {
         registerLoginButtonListener(loginButton);
         middlePanel.add(loginButton);
 
-        JButton backButton = new JButton("Back");
+        backButton = new JButton("Back");
         registerBackButtonListener(backButton);
         middlePanel.add(backButton);
     }
@@ -144,6 +144,7 @@ public class LoginWindow extends JFrame implements LibWindow {
             this.resetForm();
             LibrarySystem.hideAllWindows();
             LibrarySystem.INSTANCE.setVisible(true);
+            LibrarySystem.INSTANCE.toggleMenus();
         });
     }
 
@@ -161,7 +162,8 @@ public class LoginWindow extends JFrame implements LibWindow {
                 try {
                     ci.login(username, password);
                     JOptionPane.showMessageDialog(this, "Successful Login");
-                    resetForm();
+//                    resetForm();
+                    backButton.doClick();
                 } catch (LoginException e) {
 //                    throw new RuntimeException(e);
                     JOptionPane.showMessageDialog(null, e.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);
