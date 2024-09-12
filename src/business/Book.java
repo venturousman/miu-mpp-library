@@ -62,7 +62,6 @@ final public class Book implements Serializable {
         return b.isbn.equals(isbn);
     }
 
-
     public boolean isAvailable() {
         if (copies == null) {
             return false;
@@ -91,6 +90,16 @@ final public class Book implements Serializable {
 
     public List<Author> getAuthors() {
         return authors;
+    }
+
+    public String getAuthorNames() {
+        if (authors == null || authors.isEmpty()) return null;
+        // Using Stream to filter and sort names
+        List<String> authorNames = authors.stream()
+                .map(Author::getFullName)  // Extract names
+                .sorted()                  // Sorting alphabetically
+                .toList();                 // Collecting results to a list
+        return String.join(",", authorNames);
     }
 
     public String getIsbn() {
