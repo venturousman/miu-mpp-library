@@ -38,4 +38,9 @@ public class BookController {
         da.saveNewBook(newBook);
         this.reloadData();
     }
+
+    public void deleteBook(String isbn) {
+        da.deleteBook(isbn);
+        this.reloadData();
+    }
 }

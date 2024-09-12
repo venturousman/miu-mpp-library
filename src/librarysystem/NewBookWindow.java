@@ -34,6 +34,8 @@ public class NewBookWindow extends JFrame implements LibWindow {
     private JTextField checkoutLengthTextField;
 
     private JButton addBookButton;
+    private JButton updateBookButton;
+    private JButton deleteBookButton;
     private JButton clearFormButton;
 
     // Create the red border for invalid input
@@ -99,7 +101,7 @@ public class NewBookWindow extends JFrame implements LibWindow {
         leftPanel.add(isbnLabel);
         leftPanel.add(bookISBNTextField);
 
-        JLabel checkoutLengthLabel = new JLabel("Checkout Length");
+        JLabel checkoutLengthLabel = new JLabel("Max Checkout Days");
         checkoutLengthTextField = new JTextField("21");
         // Add a KeyListener to restrict input to digits and a minus sign
         checkoutLengthTextField.addKeyListener(new KeyAdapter() {
@@ -120,6 +122,14 @@ public class NewBookWindow extends JFrame implements LibWindow {
         registerAddButtonListener(addBookButton);
         leftPanel.add(addBookButton);
 
+        updateBookButton = new JButton("Update");
+        registerUpdateButtonListener(updateBookButton);
+        leftPanel.add(updateBookButton);
+
+        deleteBookButton = new JButton("Delete");
+        registerDeleteButtonListener(deleteBookButton);
+        leftPanel.add(deleteBookButton);
+
         clearFormButton = new JButton("Clear");
         registerClearButtonListener(clearFormButton);
         leftPanel.add(clearFormButton);
@@ -133,8 +143,6 @@ public class NewBookWindow extends JFrame implements LibWindow {
         middlePanel = new JPanel();
         FlowLayout fl = new FlowLayout(FlowLayout.CENTER, 0, 8);
         middlePanel.setLayout(fl);
-//        textArea = new TextArea(8, 20);
-//        middlePanel.add(textArea);
 
         JScrollPane scrollPane = new JScrollPane();
         scrollPane.setPreferredSize(new Dimension(850, 540));
@@ -146,9 +154,12 @@ public class NewBookWindow extends JFrame implements LibWindow {
             @Override
             public void mouseClicked(MouseEvent e) {
                 int selectedRow = booksTable.getSelectedRow();
-//                idtf.setText(model.getValueAt(r, 0).toString());
-//                nametf.setText(model.getValueAt(r, 1).toString());
-//                authtf.setText(model.getValueAt(r, 2).toString());
+                String selectedISBN = booksTable.getValueAt(selectedRow, 0).toString();
+                String selectedTitle = booksTable.getValueAt(selectedRow, 1).toString();
+                String selectedCheckoutLength = booksTable.getValueAt(selectedRow, 2).toString();
+                bookISBNTextField.setText(selectedISBN);
+                bookTitleTextField.setText(selectedTitle);
+                checkoutLengthTextField.setText(selectedCheckoutLength);
             }
         });
         booksTable.setBackground(new Color(255, 255, 255));
@@ -197,11 +208,15 @@ public class NewBookWindow extends JFrame implements LibWindow {
         });
     }
 
+    private void resetForm() {
+        bookISBNTextField.setText("");
+        bookTitleTextField.setText("");
+        checkoutLengthTextField.setText(""); // "21"
+    }
+
     private void registerClearButtonListener(JButton btn) {
         btn.addActionListener(evt -> {
-            bookISBNTextField.setText("");
-            bookTitleTextField.setText("");
-            checkoutLengthTextField.setText(""); // "21"
+            this.resetForm();
         });
     }
 
@@ -261,6 +276,46 @@ public class NewBookWindow extends JFrame implements LibWindow {
                 JOptionPane.showMessageDialog(null, "Added Successfully");
                 // reload / re-render
                 loadBooksToTable();
+            }
+        });
+    }
+
+    private void registerDeleteButtonListener(JButton btn) {
+        btn.addActionListener(evt -> {
+            boolean isValid = true;
+            int selectedRow = booksTable.getSelectedRow();
+            if (selectedRow < 0) {
+                isValid = false;
+                JOptionPane.showMessageDialog(null, "Please select a row!", "Error", JOptionPane.ERROR_MESSAGE);
+            }
+
+            if (isValid) {
+                String selectedISBN = booksTable.getValueAt(selectedRow, 0).toString();
+                if (selectedISBN.isEmpty()) {
+                    return;
+                }
+                bookController.deleteBook(selectedISBN);
+                JOptionPane.showMessageDialog(null, "Deleted Successfully");
+                // reload / re-render
+                loadBooksToTable();
+                this.resetForm();
+            }
+        });
+    }
+
+    private void registerUpdateButtonListener(JButton btn) {
+        btn.addActionListener(evt -> {
+            boolean isValid = true;
+            int selectedRow = booksTable.getSelectedRow();
+            if (selectedRow < 0) {
+                isValid = false;
+                JOptionPane.showMessageDialog(null, "Please select a row!", "Error", JOptionPane.ERROR_MESSAGE);
+            }
+
+            if (isValid) {
+                JOptionPane.showMessageDialog(null, "Updated Successfully");
+                // reload / re-render
+//            loadBooksToTable();
             }
         });
     }
