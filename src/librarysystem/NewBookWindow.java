@@ -160,7 +160,6 @@ public class NewBookWindow extends JFrame implements LibWindow {
     }
 
     private void loadBooksToTable() {
-
         // load data
         Collection<Book> books = bookController.getBooks();
 //        System.out.println(books);
@@ -211,7 +210,8 @@ public class NewBookWindow extends JFrame implements LibWindow {
             boolean isValid = true;
 
             // validate title field is required
-            if (bookTitleTextField.getText().trim().isEmpty()) {
+            String inputTitle = bookTitleTextField.getText().trim();
+            if (inputTitle.isEmpty()) {
                 bookTitleTextField.setBorder(redBorder);
                 isValid = false;
             } else {
@@ -225,12 +225,11 @@ public class NewBookWindow extends JFrame implements LibWindow {
                 isValid = false;
             } else {
 //                bookISBNTextField.setBorder(defaultBorder);
-                // TODO check if isbn is existing
                 boolean isExisted = bookController.isExisted(inputISBN);
                 if (isExisted) {
                     bookISBNTextField.setBorder(redBorder);
                     isValid = false;
-                    JOptionPane.showMessageDialog(null, "This isbn already exists");
+                    JOptionPane.showMessageDialog(null, "This isbn already exists!", "Error", JOptionPane.ERROR_MESSAGE);
                 } else {
                     bookISBNTextField.setBorder(defaultBorder);
                 }
@@ -238,13 +237,14 @@ public class NewBookWindow extends JFrame implements LibWindow {
 
             // validate checkoutLength field is required and numeric
             String inputCheckoutLength = checkoutLengthTextField.getText().trim();
+            int checkoutLength = 0;
             if (inputCheckoutLength.isEmpty() || !Util.isNumeric(inputCheckoutLength)) {
                 checkoutLengthTextField.setBorder(redBorder);
                 isValid = false;
             } else {
 //                checkoutLengthTextField.setBorder(defaultBorder);
                 // validate checkoutLength field is less than 21 days
-                int checkoutLength = Integer.parseInt(inputCheckoutLength);
+                checkoutLength = Integer.parseInt(inputCheckoutLength);
                 if (checkoutLength < 1 || checkoutLength > 21) {
                     checkoutLengthTextField.setBorder(redBorder);
                     isValid = false;
@@ -254,7 +254,13 @@ public class NewBookWindow extends JFrame implements LibWindow {
             }
 
             if (isValid) {
-                // TODO save
+                // save book
+                // TODO input authors
+                List<Author> authors = new ArrayList<>();
+                bookController.saveNewBook(inputISBN, inputTitle, checkoutLength, authors);
+                JOptionPane.showMessageDialog(null, "Added Successfully");
+                // reload / re-render
+                loadBooksToTable();
             }
         });
     }

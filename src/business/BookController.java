@@ -9,13 +9,18 @@ import java.util.HashMap;
 import java.util.List;
 
 public class BookController {
-    //    private final DataAccess da;
-    private final HashMap<String, Book> bookMap;
+    private final DataAccess da;
+    private HashMap<String, Book> bookMap;
 
     public BookController() {
-        DataAccess da = new DataAccessFacade();
-        HashMap<String, Book> books = da.readBooksMap();
-        this.bookMap = books != null ? books : new HashMap<>();
+        da = new DataAccessFacade();
+        HashMap<String, Book> booksMap = da.readBooksMap();
+        this.bookMap = booksMap != null ? booksMap : new HashMap<>();
+    }
+
+    public void reloadData() {
+        HashMap<String, Book> booksMap = da.readBooksMap();
+        this.bookMap = booksMap != null ? booksMap : new HashMap<>();
     }
 
     public Collection<Book> getBooks() {
@@ -26,5 +31,11 @@ public class BookController {
 
     public boolean isExisted(String isbn) {
         return bookMap.containsKey(isbn);
+    }
+
+    public void saveNewBook(String isbn, String title, int maxCheckoutLength, List<Author> authors) {
+        Book newBook = new Book(isbn, title, maxCheckoutLength, authors);
+        da.saveNewBook(newBook);
+        this.reloadData();
     }
 }
