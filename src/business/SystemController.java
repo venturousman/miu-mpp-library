@@ -94,8 +94,10 @@ public class SystemController implements ControllerInterface {
         DataAccess da = new DataAccessFacade();
         LibraryMember member = getMemberById(memberID);
         Book book = getBookById(isbn);
+        if (book == null) return;
 //        int maxCheckoutLength = book.getMaxCheckoutLength();
         BookCopy bookCopy = book.getNextAvailableCopy();
+        if (bookCopy == null) return;
 
         // Get the current date
         LocalDate checkoutDate = LocalDate.now();
@@ -104,5 +106,6 @@ public class SystemController implements ControllerInterface {
 
         Checkout newCheckout = new Checkout(member, bookCopy, checkoutDate);
         da.saveNewCheckout(newCheckout);
+        da.updateBookCopyAvailability(isbn, bookCopy.getCopyNum());
     }
 }

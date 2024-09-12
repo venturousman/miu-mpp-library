@@ -11,6 +11,7 @@ import java.util.HashMap;
 import java.util.List;
 
 import business.Book;
+import business.BookCopy;
 import business.Checkout;
 import business.LibraryMember;
 
@@ -68,6 +69,17 @@ public class DataAccessFacade implements DataAccess {
             books.put(bookId, book);
         }
         saveToStorage(StorageType.BOOKS, books);
+    }
+
+    @Override
+    public void updateBookCopyAvailability(String isbn, int copyNum) {
+        HashMap<String, Book> books = readBooksMap();
+        var book = books.get(isbn);
+        var bookCopy = book.getCopy(copyNum);
+        if (bookCopy != null) {
+            bookCopy.changeAvailability();
+            saveToStorage(StorageType.BOOKS, books);
+        }
     }
 
     @SuppressWarnings("unchecked")
