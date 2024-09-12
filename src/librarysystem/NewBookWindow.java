@@ -154,12 +154,15 @@ public class NewBookWindow extends JFrame implements LibWindow {
             @Override
             public void mouseClicked(MouseEvent e) {
                 int selectedRow = booksTable.getSelectedRow();
-                String selectedISBN = booksTable.getValueAt(selectedRow, 0).toString();
-                String selectedTitle = booksTable.getValueAt(selectedRow, 1).toString();
-                String selectedCheckoutLength = booksTable.getValueAt(selectedRow, 2).toString();
-                bookISBNTextField.setText(selectedISBN);
-                bookTitleTextField.setText(selectedTitle);
-                checkoutLengthTextField.setText(selectedCheckoutLength);
+                if (selectedRow >= 0) {
+                    String selectedISBN = booksTable.getValueAt(selectedRow, 0).toString();
+                    String selectedTitle = booksTable.getValueAt(selectedRow, 1).toString();
+                    String selectedCheckoutLength = booksTable.getValueAt(selectedRow, 2).toString();
+                    bookISBNTextField.setText(selectedISBN);
+//                    bookISBNTextField.setEditable(false);
+                    bookTitleTextField.setText(selectedTitle);
+                    checkoutLengthTextField.setText(selectedCheckoutLength);
+                }
             }
         });
         booksTable.setBackground(new Color(255, 255, 255));
@@ -210,8 +213,60 @@ public class NewBookWindow extends JFrame implements LibWindow {
 
     private void resetForm() {
         bookISBNTextField.setText("");
+//        bookISBNTextField.setEditable(true);
         bookTitleTextField.setText("");
         checkoutLengthTextField.setText(""); // "21"
+    }
+
+    private boolean validateForm(String selectedISBN) {
+        boolean isValid = true;
+
+        boolean isAddingNew = selectedISBN == null || selectedISBN.isEmpty();
+
+        // validate title field is required
+        String inputTitle = bookTitleTextField.getText().trim();
+        if (inputTitle.isEmpty()) {
+            bookTitleTextField.setBorder(redBorder);
+            isValid = false;
+        } else {
+            bookTitleTextField.setBorder(defaultBorder);
+        }
+
+        // validate isbn field is required
+        String inputISBN = bookISBNTextField.getText().trim();
+        if (inputISBN.isEmpty() || !Util.isValidISBN(inputISBN)) {
+            bookISBNTextField.setBorder(redBorder);
+            isValid = false;
+        } else {
+//                bookISBNTextField.setBorder(defaultBorder);
+            boolean isExisted = bookController.isExisted(inputISBN);
+            if (isExisted && isAddingNew) {
+                bookISBNTextField.setBorder(redBorder);
+                isValid = false;
+                JOptionPane.showMessageDialog(null, "This isbn already exists!", "Error", JOptionPane.ERROR_MESSAGE);
+            } else {
+                bookISBNTextField.setBorder(defaultBorder);
+            }
+        }
+
+        // validate checkoutLength field is required and numeric
+        String inputCheckoutLength = checkoutLengthTextField.getText().trim();
+        int checkoutLength = 0;
+        if (inputCheckoutLength.isEmpty() || !Util.isNumeric(inputCheckoutLength)) {
+            checkoutLengthTextField.setBorder(redBorder);
+            isValid = false;
+        } else {
+//                checkoutLengthTextField.setBorder(defaultBorder);
+            // validate checkoutLength field is less than 21 days
+            checkoutLength = Integer.parseInt(inputCheckoutLength);
+            if (checkoutLength < 1 || checkoutLength > 21) {
+                checkoutLengthTextField.setBorder(redBorder);
+                isValid = false;
+            } else {
+                checkoutLengthTextField.setBorder(defaultBorder);
+            }
+        }
+        return isValid;
     }
 
     private void registerClearButtonListener(JButton btn) {
@@ -222,100 +277,80 @@ public class NewBookWindow extends JFrame implements LibWindow {
 
     private void registerAddButtonListener(JButton btn) {
         btn.addActionListener(evt -> {
-            boolean isValid = true;
-
-            // validate title field is required
-            String inputTitle = bookTitleTextField.getText().trim();
-            if (inputTitle.isEmpty()) {
-                bookTitleTextField.setBorder(redBorder);
-                isValid = false;
-            } else {
-                bookTitleTextField.setBorder(defaultBorder);
-            }
-
-            // validate isbn field is required
-            String inputISBN = bookISBNTextField.getText().trim();
-            if (inputISBN.isEmpty() || !Util.isValidISBN(inputISBN)) {
-                bookISBNTextField.setBorder(redBorder);
-                isValid = false;
-            } else {
-//                bookISBNTextField.setBorder(defaultBorder);
-                boolean isExisted = bookController.isExisted(inputISBN);
-                if (isExisted) {
-                    bookISBNTextField.setBorder(redBorder);
-                    isValid = false;
-                    JOptionPane.showMessageDialog(null, "This isbn already exists!", "Error", JOptionPane.ERROR_MESSAGE);
-                } else {
-                    bookISBNTextField.setBorder(defaultBorder);
-                }
-            }
-
-            // validate checkoutLength field is required and numeric
-            String inputCheckoutLength = checkoutLengthTextField.getText().trim();
-            int checkoutLength = 0;
-            if (inputCheckoutLength.isEmpty() || !Util.isNumeric(inputCheckoutLength)) {
-                checkoutLengthTextField.setBorder(redBorder);
-                isValid = false;
-            } else {
-//                checkoutLengthTextField.setBorder(defaultBorder);
-                // validate checkoutLength field is less than 21 days
-                checkoutLength = Integer.parseInt(inputCheckoutLength);
-                if (checkoutLength < 1 || checkoutLength > 21) {
-                    checkoutLengthTextField.setBorder(redBorder);
-                    isValid = false;
-                } else {
-                    checkoutLengthTextField.setBorder(defaultBorder);
-                }
-            }
+            boolean isValid = validateForm(null);
 
             if (isValid) {
                 // save book
+                String inputTitle = bookTitleTextField.getText().trim();
+                String inputISBN = bookISBNTextField.getText().trim();
+                String inputCheckoutLength = checkoutLengthTextField.getText().trim();
+                int checkoutLength = Integer.parseInt(inputCheckoutLength);
+
                 // TODO input authors
                 List<Author> authors = new ArrayList<>();
                 bookController.saveNewBook(inputISBN, inputTitle, checkoutLength, authors);
                 JOptionPane.showMessageDialog(null, "Added Successfully");
                 // reload / re-render
                 loadBooksToTable();
+                resetForm();
             }
         });
     }
 
     private void registerDeleteButtonListener(JButton btn) {
         btn.addActionListener(evt -> {
-            boolean isValid = true;
             int selectedRow = booksTable.getSelectedRow();
             if (selectedRow < 0) {
-                isValid = false;
                 JOptionPane.showMessageDialog(null, "Please select a row!", "Error", JOptionPane.ERROR_MESSAGE);
+                return;
+            }
+
+            boolean isValid = true;
+
+            String selectedISBN = booksTable.getValueAt(selectedRow, 0).toString();
+            if (selectedISBN.isEmpty() || !bookController.isExisted(selectedISBN)) {
+                isValid = false;
             }
 
             if (isValid) {
-                String selectedISBN = booksTable.getValueAt(selectedRow, 0).toString();
-                if (selectedISBN.isEmpty()) {
-                    return;
-                }
                 bookController.deleteBook(selectedISBN);
                 JOptionPane.showMessageDialog(null, "Deleted Successfully");
                 // reload / re-render
                 loadBooksToTable();
-                this.resetForm();
+                resetForm();
             }
         });
     }
 
     private void registerUpdateButtonListener(JButton btn) {
         btn.addActionListener(evt -> {
-            boolean isValid = true;
             int selectedRow = booksTable.getSelectedRow();
             if (selectedRow < 0) {
-                isValid = false;
                 JOptionPane.showMessageDialog(null, "Please select a row!", "Error", JOptionPane.ERROR_MESSAGE);
+                return;
             }
 
+            String selectedISBN = booksTable.getValueAt(selectedRow, 0).toString();
+            if (selectedISBN.isEmpty() || !bookController.isExisted(selectedISBN)) {
+                return;
+            }
+
+            boolean isValid = validateForm(selectedISBN);
+
             if (isValid) {
+                String updatedISBN = bookISBNTextField.getText().trim();
+                String updatedTitle = bookTitleTextField.getText().trim();
+                String updatedCheckoutLength = checkoutLengthTextField.getText().trim();
+                int checkoutLength = Integer.parseInt(updatedCheckoutLength);
+
+                // TODO updated authors
+                List<Author> authors = new ArrayList<>();
+                bookController.updateBook(selectedISBN, updatedISBN, updatedTitle, checkoutLength, authors);
+
                 JOptionPane.showMessageDialog(null, "Updated Successfully");
                 // reload / re-render
-//            loadBooksToTable();
+                loadBooksToTable();
+                resetForm();
             }
         });
     }

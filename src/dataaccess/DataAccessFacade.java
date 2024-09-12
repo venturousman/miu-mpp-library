@@ -52,6 +52,18 @@ public class DataAccessFacade implements DataAccess {
         saveToStorage(StorageType.BOOKS, books);
     }
 
+    public void updateBook(String isbn, Book book) {
+        HashMap<String, Book> books = readBooksMap();
+        String bookId = book.getIsbn();
+        if (bookId.equals(isbn)) {
+            books.replace(isbn, book);
+        } else {
+            books.remove(isbn);
+            books.put(bookId, book);
+        }
+        saveToStorage(StorageType.BOOKS, books);
+    }
+
     @SuppressWarnings("unchecked")
     public HashMap<String, Book> readBooksMap() {
         //Returns a Map with name/value pairs being isbn -> Book

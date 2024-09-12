@@ -18,4 +18,6 @@ public interface DataAccess {
     public void saveNewBook(Book book);
 
     public void deleteBook(String isbn);
+
+    public void updateBook(String isbn, Book book);
 }
