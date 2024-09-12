@@ -5,17 +5,11 @@ import java.io.File;
 import java.io.IOException;
 
 import javax.imageio.ImageIO;
-import javax.swing.BorderFactory;
-import javax.swing.ImageIcon;
-import javax.swing.JFrame;
-import javax.swing.JLabel;
-import javax.swing.JMenu;
-import javax.swing.JMenuBar;
-import javax.swing.JMenuItem;
-import javax.swing.JPanel;
+import javax.swing.*;
 
 import business.ControllerInterface;
 import business.SystemController;
+import dataaccess.Auth;
 import librarysystem.listener.*;
 
 public class LibrarySystem extends JFrame implements LibWindow {
@@ -24,12 +18,13 @@ public class LibrarySystem extends JFrame implements LibWindow {
     JPanel mainPanel;
     JMenuBar menuBar;
     JMenu accountMenu;
-    JMenuItem loginMenuItem, allBookIds, allMemberIds;
+    JMenuItem loginMenuItem, logoutMenuItem;
     JMenu bookMenu, memberMenu, helpMenu;
     JMenuItem newBookMenuItem, checkoutBookMenuItem, newBookCopyMenuItem;
     JMenuItem newMemberMenuItem;
     JMenuItem aboutMenuItem;
     String pathToImage, pathToIcon;
+    JLabel authLabel;
     private boolean isInitialized = false;
 
     private static final LibWindow[] allWindows = {
@@ -61,6 +56,44 @@ public class LibrarySystem extends JFrame implements LibWindow {
         //pack();
         setSize(660, 500);
         isInitialized = true;
+    }
+
+    public void toggleMenus() {
+//        System.out.println(SystemController.currentAuth);
+        Auth currentAuth = SystemController.currentAuth;
+        if (currentAuth == null) {
+            authLabel.setVisible(false);
+            loginMenuItem.setEnabled(true);
+            logoutMenuItem.setEnabled(false);
+
+            bookMenu.setEnabled(false);
+            memberMenu.setEnabled(false);
+        } else {
+            authLabel.setText("I am " + currentAuth);
+            authLabel.setVisible(true);
+            loginMenuItem.setEnabled(false);
+            logoutMenuItem.setEnabled(true);
+
+            bookMenu.setEnabled(true);
+            memberMenu.setEnabled(true);
+
+            if (currentAuth == Auth.BOTH) {
+                checkoutBookMenuItem.setEnabled(true);
+                newBookMenuItem.setEnabled(true);
+                newBookCopyMenuItem.setEnabled(true);
+                newMemberMenuItem.setEnabled(true);
+            } else if (currentAuth == Auth.ADMIN) {
+                checkoutBookMenuItem.setEnabled(false);
+                newBookMenuItem.setEnabled(true);
+                newBookCopyMenuItem.setEnabled(true);
+                newMemberMenuItem.setEnabled(true);
+            } else if (currentAuth == Auth.LIBRARIAN) {
+                checkoutBookMenuItem.setEnabled(true);
+                newBookMenuItem.setEnabled(false);
+                newBookCopyMenuItem.setEnabled(false);
+                newMemberMenuItem.setEnabled(false);
+            }
+        }
     }
 
     private void formatContentPane() {
@@ -101,9 +134,27 @@ public class LibrarySystem extends JFrame implements LibWindow {
         accountMenu = new JMenu("Account");
         menuBar.add(accountMenu);
         // items
+        authLabel = new JLabel();
+        accountMenu.add(authLabel);
+
         loginMenuItem = new JMenuItem("Login");
         loginMenuItem.addActionListener(new LoginMenuItemListener());
         accountMenu.add(loginMenuItem);
+
+        logoutMenuItem = new JMenuItem("Logout");
+        registerLogoutMenuItemListener(logoutMenuItem);
+//        logoutMenuItem.addActionListener(new LogoutMenuItemListener());
+        accountMenu.add(logoutMenuItem);
+
+        if (SystemController.currentAuth == null) {
+            authLabel.setVisible(false);
+            loginMenuItem.setEnabled(true);
+            logoutMenuItem.setEnabled(false);
+        }
+//        else {
+//            loginMenuItem.setEnabled(false);
+//            logoutMenuItem.setEnabled(true);
+//        }
     }
 
     private void addBookMenu() {
@@ -121,6 +172,10 @@ public class LibrarySystem extends JFrame implements LibWindow {
         checkoutBookMenuItem = new JMenuItem("Checkout Book(s)");
         checkoutBookMenuItem.addActionListener(new CheckoutBookMenuItemListener());
         bookMenu.add(checkoutBookMenuItem);
+
+        if (SystemController.currentAuth == null) {
+            bookMenu.setEnabled(false);
+        }
     }
 
     private void addMemberMenu() {
@@ -130,6 +185,10 @@ public class LibrarySystem extends JFrame implements LibWindow {
         newMemberMenuItem = new JMenuItem("New Member");
         newMemberMenuItem.addActionListener(new NewMemberMenuItemListener());
         memberMenu.add(newMemberMenuItem);
+
+        if (SystemController.currentAuth == null) {
+            memberMenu.setEnabled(false);
+        }
     }
 
     private void addHelpMenu() {
@@ -139,6 +198,13 @@ public class LibrarySystem extends JFrame implements LibWindow {
         aboutMenuItem = new JMenuItem("About");
 //        aboutMenuItem.addActionListener(new );
         helpMenu.add(aboutMenuItem);
+    }
+
+    private void registerLogoutMenuItemListener(JMenuItem menuItem) {
+        menuItem.addActionListener(evt -> {
+            ci.logout();
+            this.toggleMenus();
+        });
     }
 
     @Override

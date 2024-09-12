@@ -1,6 +1,7 @@
 package librarysystem.listener;
 
 import librarysystem.LibrarySystem;
+import librarysystem.NewBookCopyWindow;
 import librarysystem.NewBookWindow;
 import librarysystem.Util;
 
@@ -12,11 +13,14 @@ public class NewBookMenuItemListener implements ActionListener {
     @Override
     public void actionPerformed(ActionEvent e) {
         LibrarySystem.hideAllWindows();
-        NewBookWindow.INSTANCE.init();
-        NewBookWindow.INSTANCE.setSize(1200, 600);
-        Util.centerFrameOnDesktop(NewBookWindow.INSTANCE);
+        if (!NewBookWindow.INSTANCE.isInitialized()) {
+            NewBookWindow.INSTANCE.init();
+            NewBookWindow.INSTANCE.setSize(1200, 600);
+            Util.centerFrameOnDesktop(NewBookWindow.INSTANCE);
+            NewBookWindow.INSTANCE.setTitle("New Book Window");
+            NewBookWindow.INSTANCE.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+        }
         NewBookWindow.INSTANCE.setVisible(true);
-        NewBookWindow.INSTANCE.setTitle("New Book Window");
-        NewBookWindow.INSTANCE.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+//        NewBookWindow.INSTANCE.repaint();  // Refresh the display
     }
 }
