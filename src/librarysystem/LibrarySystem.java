@@ -24,7 +24,7 @@ public class LibrarySystem extends JFrame implements LibWindow {
     JPanel mainPanel;
     JMenuBar menuBar;
     JMenu accountMenu;
-    JMenuItem loginMenuItem, allBookIds, allMemberIds;
+    JMenuItem loginMenuItem, logoutMenuItem;
     JMenu bookMenu, memberMenu, helpMenu;
     JMenuItem newBookMenuItem, checkoutBookMenuItem, newBookCopyMenuItem;
     JMenuItem newMemberMenuItem;
@@ -104,6 +104,10 @@ public class LibrarySystem extends JFrame implements LibWindow {
         loginMenuItem = new JMenuItem("Login");
         loginMenuItem.addActionListener(new LoginMenuItemListener());
         accountMenu.add(loginMenuItem);
+
+        logoutMenuItem = new JMenuItem("Logout");
+//        logoutMenuItem.addActionListener(new LogoutMenuItemListener());
+        accountMenu.add(logoutMenuItem);
     }
 
     private void addBookMenu() {
