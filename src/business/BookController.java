@@ -36,6 +36,17 @@ public class BookController {
     public void saveNewBook(String isbn, String title, int maxCheckoutLength, List<Author> authors) {
         Book newBook = new Book(isbn, title, maxCheckoutLength, authors);
         da.saveNewBook(newBook);
-        this.reloadData();
+        reloadData();
+    }
+
+    public void deleteBook(String isbn) {
+        da.deleteBook(isbn);
+        reloadData();
+    }
+
+    public void updateBook(String oldISBN, String newISBN, String title, int maxCheckoutLength, List<Author> authors) {
+        Book book = new Book(newISBN, title, maxCheckoutLength, authors);
+        da.updateBook(oldISBN, book);
+        reloadData();
     }
 }
