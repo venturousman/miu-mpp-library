@@ -11,8 +11,8 @@ import java.awt.event.KeyAdapter;
 import java.awt.event.KeyEvent;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
-import java.util.ArrayList;
-import java.util.List;
+import java.time.LocalDate;
+import java.time.format.DateTimeFormatter;
 
 public class CheckoutBookWindow extends JFrame implements LibWindow {
 
@@ -35,7 +35,7 @@ public class CheckoutBookWindow extends JFrame implements LibWindow {
     // Create the default border to reset later
     private Border defaultBorder;
     private final String[] columnNames = {
-            "Id", // TODO
+            "Due Date", "Checkout Date", "Member", "Book ISBN", "Book Title",
     };
 
     private CheckoutBookWindow() {
@@ -63,6 +63,20 @@ public class CheckoutBookWindow extends JFrame implements LibWindow {
         leftPanel = new JPanel();
         leftPanel.setLayout(new FlowLayout(FlowLayout.LEFT, 20, 8));
         leftPanel.setPreferredSize(new Dimension(300, 600));
+
+        // Get the current date
+        LocalDate currentDate = LocalDate.now();
+        // Define the desired date format (MM-DD-YYYY)
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("MM-dd-yyyy");
+        // Format the current date
+        String formattedDate = currentDate.format(formatter);
+        JLabel nowLabel = new JLabel("Today is " + formattedDate);
+        leftPanel.add(nowLabel);
+
+        // Create a horizontal JSeparator (the default is horizontal)
+        JSeparator separator = new JSeparator(SwingConstants.HORIZONTAL);
+        separator.setPreferredSize(new Dimension(250, 1)); // Set preferred size (width x height)
+        leftPanel.add(separator);
 
         // textboxes
         JLabel memberIdLabel = new JLabel("Member ID");
@@ -203,17 +217,31 @@ public class CheckoutBookWindow extends JFrame implements LibWindow {
 
     private void loadCheckoutsToTable() {
         var checkouts = ci.allCheckouts();
-//        System.out.println(checkouts);
+        System.out.println(checkouts);
 
-        Object[][] items = new Object[checkouts.size()][];
+        // sum entries
+        int sum = 0;
+        for (Checkout checkout : checkouts) {
+            sum += checkout.getNumEntries();
+        }
+
+        Object[][] items = new Object[sum][];
 
         int i = 0;
         for (Checkout checkout : checkouts) {
-            Object[] item = new Object[]{
-                    checkout.getId(),
-                    // TODO
-            };
-            items[i++] = item;
+            var entries = checkout.getEntries();
+            if (entries != null) {
+                for (CheckoutEntry entry : checkout.getEntries()) {
+                    Object[] item = new Object[]{
+                            entry.getDueDate(),
+                            entry.getCheckoutDate(),
+                            checkout.getMember().getFullName(),
+                            entry.getBookCopy().getBook().getIsbn(),
+                            entry.getBookCopy().getBook().getTitle(),
+                    };
+                    items[i++] = item;
+                }
+            }
         }
 
         // Creating a DefaultTableModel with isCellEditable() overridden to return false

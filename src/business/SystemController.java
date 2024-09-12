@@ -94,15 +94,15 @@ public class SystemController implements ControllerInterface {
         DataAccess da = new DataAccessFacade();
         LibraryMember member = getMemberById(memberID);
         Book book = getBookById(isbn);
-        int maxCheckoutLength = book.getMaxCheckoutLength();
+//        int maxCheckoutLength = book.getMaxCheckoutLength();
         BookCopy bookCopy = book.getNextAvailableCopy();
 
         // Get the current date
-        LocalDate currentDate = LocalDate.now();
-        // Add 5 days to the current date
-        LocalDate dueDate = currentDate.plusDays(maxCheckoutLength);
+        LocalDate checkoutDate = LocalDate.now();
+        // Add N days to the current date
+//        LocalDate dueDate = checkoutDate.plusDays(maxCheckoutLength);
 
-        Checkout newCheckout = new Checkout(member, bookCopy, dueDate);
+        Checkout newCheckout = new Checkout(member, bookCopy, checkoutDate);
         da.saveNewCheckout(newCheckout);
     }
 }

@@ -38,4 +38,9 @@ public final class Checkout implements Serializable {
     public String getId() {
         return checkoutId;
     }
+
+    public int getNumEntries() {
+        if (entries == null) return 0;
+        return entries.length;
+    }
 }

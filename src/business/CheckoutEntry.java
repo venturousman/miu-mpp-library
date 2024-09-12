@@ -25,4 +25,9 @@ public final class CheckoutEntry implements Serializable {
     public LocalDate getCheckoutDate() {
         return checkoutDate;
     }
+
+    public LocalDate getDueDate() {
+        Book book = bookCopy.getBook();
+        return checkoutDate.plusDays(book.getMaxCheckoutLength());
+    }
 }
