@@ -12,13 +12,13 @@ import java.util.List;
 
 import business.Book;
 import business.BookCopy;
+import business.Checkout;
 import business.LibraryMember;
-import dataaccess.DataAccessFacade.StorageType;
 
 public class DataAccessFacade implements DataAccess {
 
     enum StorageType {
-        BOOKS, MEMBERS, USERS;
+        BOOKS, MEMBERS, USERS, CHECKOUTS
     }
     // Windows user can use
 	
@@ -33,10 +33,17 @@ public class DataAccessFacade implements DataAccess {
 
     //implement: other save operations
     public void saveNewMember(LibraryMember member) {
-        HashMap<String, LibraryMember> mems = readMemberMap();
+        HashMap<String, LibraryMember> members = readMemberMap();
         String memberId = member.getMemberId();
-        mems.put(memberId, member);
-        saveToStorage(StorageType.MEMBERS, mems);
+        members.put(memberId, member);
+        saveToStorage(StorageType.MEMBERS, members);
+    }
+
+    public void saveNewCheckout(Checkout checkout) {
+        HashMap<String, Checkout> checkouts = readCheckoutMap();
+        String checkoutId = checkout.getId();
+        checkouts.put(checkoutId, checkout);
+        saveToStorage(StorageType.CHECKOUTS, checkouts);
     }
 
     public void saveNewBook(Book book) {
@@ -64,6 +71,17 @@ public class DataAccessFacade implements DataAccess {
         saveToStorage(StorageType.BOOKS, books);
     }
 
+    @Override
+    public void updateBookCopyAvailability(String isbn, int copyNum) {
+        HashMap<String, Book> books = readBooksMap();
+        var book = books.get(isbn);
+        var bookCopy = book.getCopy(copyNum);
+        if (bookCopy != null) {
+            bookCopy.changeAvailability();
+            saveToStorage(StorageType.BOOKS, books);
+        }
+    }
+
     @SuppressWarnings("unchecked")
     public HashMap<String, Book> readBooksMap() {
         //Returns a Map with name/value pairs being isbn -> Book
@@ -74,6 +92,12 @@ public class DataAccessFacade implements DataAccess {
     public HashMap<String, LibraryMember> readMemberMap() {
         //Returns a Map with name/value pairs being memberId -> LibraryMember
         return (HashMap<String, LibraryMember>) readFromStorage(StorageType.MEMBERS);
+    }
+
+    @SuppressWarnings("unchecked")
+    @Override
+    public HashMap<String, Checkout> readCheckoutMap() {
+        return (HashMap<String, Checkout>) readFromStorage(StorageType.CHECKOUTS);
     }
 
     @SuppressWarnings("unchecked")
@@ -101,6 +125,11 @@ public class DataAccessFacade implements DataAccess {
         HashMap<String, LibraryMember> members = new HashMap<String, LibraryMember>();
         memberList.forEach(member -> members.put(member.getMemberId(), member));
         saveToStorage(StorageType.MEMBERS, members);
+    }
+
+    static void loadCheckout(List<Checkout> checkoutList) {
+        HashMap<String, Checkout> checkouts = new HashMap<>();
+        saveToStorage(StorageType.CHECKOUTS, checkouts);
     }
 
     static void saveToStorage(StorageType type, Object ob) {

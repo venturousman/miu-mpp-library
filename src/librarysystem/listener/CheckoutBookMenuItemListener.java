@@ -14,7 +14,7 @@ public class CheckoutBookMenuItemListener implements ActionListener {
         LibrarySystem.hideAllWindows();
         if (!CheckoutBookWindow.INSTANCE.isInitialized()) {
             CheckoutBookWindow.INSTANCE.init();
-            CheckoutBookWindow.INSTANCE.setSize(660, 500);
+            CheckoutBookWindow.INSTANCE.setSize(1200, 600);
             Util.centerFrameOnDesktop(CheckoutBookWindow.INSTANCE);
             CheckoutBookWindow.INSTANCE.setTitle("Checkout Book Window");
             CheckoutBookWindow.INSTANCE.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);

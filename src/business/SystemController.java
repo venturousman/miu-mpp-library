@@ -1,5 +1,6 @@
 package business;
 
+import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -46,5 +47,65 @@ public class SystemController implements ControllerInterface {
     public List<Book> allBooks() {
         DataAccess da = new DataAccessFacade();
         return new ArrayList<>(da.readBooksMap().values());
+    }
+
+    @Override
+    public List<Checkout> allCheckouts() {
+        DataAccess da = new DataAccessFacade();
+        return new ArrayList<>(da.readCheckoutMap().values());
+    }
+
+    @Override
+    public Book getBookById(String isbn) {
+        DataAccess da = new DataAccessFacade();
+        var books = da.readBooksMap();
+        return books.get(isbn);
+    }
+
+    @Override
+    public LibraryMember getMemberById(String memberID) {
+        DataAccess da = new DataAccessFacade();
+        var members = da.readMemberMap();
+        return members.get(memberID);
+    }
+
+    @Override
+    public void saveNewBook(String isbn, String title, int maxCheckoutLength, List<Author> authors) {
+        Book newBook = new Book(isbn, title, maxCheckoutLength, authors);
+        DataAccess da = new DataAccessFacade();
+        da.saveNewBook(newBook);
+    }
+
+    @Override
+    public void deleteBook(String isbn) {
+        DataAccess da = new DataAccessFacade();
+        da.deleteBook(isbn);
+    }
+
+    @Override
+    public void updateBook(String oldISBN, String newISBN, String title, int maxCheckoutLength, List<Author> authors) {
+        Book book = new Book(newISBN, title, maxCheckoutLength, authors);
+        DataAccess da = new DataAccessFacade();
+        da.updateBook(oldISBN, book);
+    }
+
+    @Override
+    public void saveNewCheckout(String isbn, String memberID) {
+        DataAccess da = new DataAccessFacade();
+        LibraryMember member = getMemberById(memberID);
+        Book book = getBookById(isbn);
+        if (book == null) return;
+//        int maxCheckoutLength = book.getMaxCheckoutLength();
+        BookCopy bookCopy = book.getNextAvailableCopy();
+        if (bookCopy == null) return;
+
+        // Get the current date
+        LocalDate checkoutDate = LocalDate.now();
+        // Add N days to the current date
+//        LocalDate dueDate = checkoutDate.plusDays(maxCheckoutLength);
+
+        Checkout newCheckout = new Checkout(member, bookCopy, checkoutDate);
+        da.saveNewCheckout(newCheckout);
+        da.updateBookCopyAvailability(isbn, bookCopy.getCopyNum());
     }
 }

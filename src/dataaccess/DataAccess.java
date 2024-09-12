@@ -2,8 +2,7 @@ package dataaccess;
 
 import java.util.HashMap;
 
-import business.Book;
-import business.LibraryMember;
+import business.*;
 import dataaccess.DataAccessFacade.StorageType;
 
 public interface DataAccess {
@@ -13,6 +12,10 @@ public interface DataAccess {
 
     public HashMap<String, LibraryMember> readMemberMap();
 
+    public HashMap<String, Checkout> readCheckoutMap();
+
+    public void saveNewCheckout(Checkout checkout);
+
     public void saveNewMember(LibraryMember member);
 
     public void saveNewBook(Book book);
@@ -20,4 +23,6 @@ public interface DataAccess {
     public void deleteBook(String isbn);
 
     public void updateBook(String isbn, Book book);
+
+    public void updateBookCopyAvailability(String isbn, int copyNum);
 }

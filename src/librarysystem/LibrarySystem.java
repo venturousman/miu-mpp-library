@@ -30,8 +30,6 @@ public class LibrarySystem extends JFrame implements LibWindow {
     private static final LibWindow[] allWindows = {
             LibrarySystem.INSTANCE,
             LoginWindow.INSTANCE,
-            AllMemberIdsWindow.INSTANCE,
-            AllBookIdsWindow.INSTANCE,
             NewMemberWindow.INSTANCE,
             NewBookWindow.INSTANCE,
             NewBookCopyWindow.INSTANCE,
