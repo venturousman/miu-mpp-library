@@ -206,6 +206,7 @@ public class NewBookWindow extends JFrame implements LibWindow {
 
     private void registerBackButtonListener(JButton btn) {
         btn.addActionListener(evt -> {
+            this.resetForm();
             LibrarySystem.hideAllWindows();
             LibrarySystem.INSTANCE.setVisible(true);
         });
@@ -213,9 +214,12 @@ public class NewBookWindow extends JFrame implements LibWindow {
 
     private void resetForm() {
         bookISBNTextField.setText("");
+        bookISBNTextField.setBorder(defaultBorder);
 //        bookISBNTextField.setEditable(true);
         bookTitleTextField.setText("");
+        bookTitleTextField.setBorder(defaultBorder);
         checkoutLengthTextField.setText(""); // "21"
+        checkoutLengthTextField.setBorder(defaultBorder);
     }
 
     private boolean validateForm(String selectedISBN) {
