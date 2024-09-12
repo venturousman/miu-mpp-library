@@ -21,7 +21,7 @@ public class NewBookWindow extends JFrame implements LibWindow {
 
     public static final NewBookWindow INSTANCE = new NewBookWindow();
     //    ControllerInterface ci = new SystemController();
-    BookController controller = new BookController();
+    BookController bookController = new BookController();
 
     private boolean isInitialized = false;
     private JPanel mainPanel;
@@ -85,6 +85,16 @@ public class NewBookWindow extends JFrame implements LibWindow {
 
         JLabel isbnLabel = new JLabel("Book ISBN");
         bookISBNTextField = new JTextField();
+        bookISBNTextField.addKeyListener(new KeyAdapter() {
+            @Override
+            public void keyTyped(KeyEvent e) {
+                char ch = e.getKeyChar();
+                // Allow only digits and minus sign
+                if (!Character.isDigit(ch) && ch != '-') {
+                    e.consume();  // Ignore invalid input
+                }
+            }
+        });
         bookISBNTextField.setPreferredSize(new Dimension(250, 30));
         leftPanel.add(isbnLabel);
         leftPanel.add(bookISBNTextField);
@@ -152,7 +162,7 @@ public class NewBookWindow extends JFrame implements LibWindow {
     private void loadBooksToTable() {
 
         // load data
-        Collection<Book> books = controller.getBooks();
+        Collection<Book> books = bookController.getBooks();
 //        System.out.println(books);
 
         Object[][] items = new Object[books.size()][];
@@ -209,11 +219,21 @@ public class NewBookWindow extends JFrame implements LibWindow {
             }
 
             // validate isbn field is required
-            if (bookISBNTextField.getText().trim().isEmpty()) {
+            String inputISBN = bookISBNTextField.getText().trim();
+            if (inputISBN.isEmpty() || !Util.isValidISBN(inputISBN)) {
                 bookISBNTextField.setBorder(redBorder);
                 isValid = false;
             } else {
-                bookISBNTextField.setBorder(defaultBorder);
+//                bookISBNTextField.setBorder(defaultBorder);
+                // TODO check if isbn is existing
+                boolean isExisted = bookController.isExisted(inputISBN);
+                if (isExisted) {
+                    bookISBNTextField.setBorder(redBorder);
+                    isValid = false;
+                    JOptionPane.showMessageDialog(null, "This isbn already exists");
+                } else {
+                    bookISBNTextField.setBorder(defaultBorder);
+                }
             }
 
             // validate checkoutLength field is required and numeric

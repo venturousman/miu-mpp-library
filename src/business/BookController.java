@@ -5,12 +5,26 @@ import dataaccess.DataAccessFacade;
 
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.HashMap;
 import java.util.List;
 
 public class BookController {
-    public Collection<Book> getBooks() {
+    //    private final DataAccess da;
+    private final HashMap<String, Book> bookMap;
+
+    public BookController() {
         DataAccess da = new DataAccessFacade();
-        //List<Book> books = new ArrayList<Book>();
-        return da.readBooksMap().values();
+        HashMap<String, Book> books = da.readBooksMap();
+        this.bookMap = books != null ? books : new HashMap<>();
+    }
+
+    public Collection<Book> getBooks() {
+//        DataAccess da = new DataAccessFacade();
+//        HashMap<String, Book> bookMap = da.readBooksMap();
+        return bookMap.values();
+    }
+
+    public boolean isExisted(String isbn) {
+        return bookMap.containsKey(isbn);
     }
 }

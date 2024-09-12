@@ -33,7 +33,6 @@ public class Util {
             label.setFont(f);
         }
         label.setForeground(color);
-
     }
 
     /**
@@ -74,5 +73,12 @@ public class Util {
         int frameHeight = f.getSize().height;
         int frameWidth = f.getSize().width;
         f.setLocation(((width - frameWidth) / 2), (height - frameHeight) / 3);
+    }
+
+    public static boolean isValidISBN(String isbn) {
+        // Pattern for ISBN-13: ^(97[89])-\d{1,5}-\d{1,7}-\d{1,7}-\d$
+        // Pattern for ISBN-10: ^\d{1,5}-\d{1,7}-\d{1,7}-[\dX]$
+        String pattern = "\\d{2}-\\d{5}";
+        return isbn.matches(pattern);
     }
 }
