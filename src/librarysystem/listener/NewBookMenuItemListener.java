@@ -1,6 +1,7 @@
 package librarysystem.listener;
 
 import librarysystem.LibrarySystem;
+import librarysystem.NewBookCopyWindow;
 import librarysystem.NewBookWindow;
 import librarysystem.Util;
 
@@ -15,8 +16,9 @@ public class NewBookMenuItemListener implements ActionListener {
         NewBookWindow.INSTANCE.init();
         NewBookWindow.INSTANCE.setSize(1200, 600);
         Util.centerFrameOnDesktop(NewBookWindow.INSTANCE);
-        NewBookWindow.INSTANCE.setVisible(true);
         NewBookWindow.INSTANCE.setTitle("New Book Window");
         NewBookWindow.INSTANCE.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+        NewBookWindow.INSTANCE.setVisible(true);
+        NewBookWindow.INSTANCE.repaint();  // Refresh the display
     }
 }

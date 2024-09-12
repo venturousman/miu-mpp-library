@@ -15,8 +15,9 @@ public class CheckoutBookMenuItemListener implements ActionListener {
         CheckoutBookWindow.INSTANCE.init();
         CheckoutBookWindow.INSTANCE.setSize(660, 500);
         Util.centerFrameOnDesktop(CheckoutBookWindow.INSTANCE);
-        CheckoutBookWindow.INSTANCE.setVisible(true);
         CheckoutBookWindow.INSTANCE.setTitle("Checkout Book Window");
         CheckoutBookWindow.INSTANCE.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+        CheckoutBookWindow.INSTANCE.setVisible(true);
+        CheckoutBookWindow.INSTANCE.repaint();  // Refresh the display
     }
 }

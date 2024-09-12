@@ -26,6 +26,11 @@ public class SystemController implements ControllerInterface {
     }
 
     @Override
+    public void logout() {
+        currentAuth = null; // reset
+    }
+
+    @Override
     public List<String> allMemberIds() {
         DataAccess da = new DataAccessFacade();
         return new ArrayList<>(da.readMemberMap().keySet());
