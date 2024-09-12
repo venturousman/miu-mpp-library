@@ -1,12 +1,11 @@
 package librarysystem;
 
-import business.Author;
-import business.SystemController;
-import business.ControllerInterface;
+import business.*;
 
 import javax.swing.*;
 import javax.swing.border.Border;
 import javax.swing.border.LineBorder;
+import javax.swing.table.DefaultTableModel;
 import java.awt.*;
 import java.awt.event.KeyAdapter;
 import java.awt.event.KeyEvent;
@@ -36,7 +35,7 @@ public class CheckoutBookWindow extends JFrame implements LibWindow {
     // Create the default border to reset later
     private Border defaultBorder;
     private final String[] columnNames = {
-            "ISBN", "Due Date",
+            "Id", // TODO
     };
 
     private CheckoutBookWindow() {
@@ -127,6 +126,7 @@ public class CheckoutBookWindow extends JFrame implements LibWindow {
         scrollPane.setViewportView(checkoutTable);
 
         // load data
+        loadCheckoutsToTable();
     }
 
     private void resetForm() {
@@ -192,14 +192,40 @@ public class CheckoutBookWindow extends JFrame implements LibWindow {
                 // save checkout
                 String inputMemberID = memberIdTextField.getText().trim();
                 String inputISBN = bookISBNTextField.getText().trim();
-                // TODO
-
+                ci.saveNewCheckout(inputISBN, inputMemberID);
                 JOptionPane.showMessageDialog(null, "Checked-out Successfully");
                 // reload / re-render
-//                loadCheckoutsToTable();
+                loadCheckoutsToTable();
                 resetForm();
             }
         });
+    }
+
+    private void loadCheckoutsToTable() {
+        var checkouts = ci.allCheckouts();
+//        System.out.println(checkouts);
+
+        Object[][] items = new Object[checkouts.size()][];
+
+        int i = 0;
+        for (Checkout checkout : checkouts) {
+            Object[] item = new Object[]{
+                    checkout.getId(),
+                    // TODO
+            };
+            items[i++] = item;
+        }
+
+        // Creating a DefaultTableModel with isCellEditable() overridden to return false
+        DefaultTableModel tableModel = new DefaultTableModel(items, columnNames) {
+            @Override
+            public boolean isCellEditable(int row, int column) {
+                // All cells are not editable
+                return false;
+            }
+        };
+
+        checkoutTable.setModel(tableModel);
     }
 
     private void registerBackButtonListener(JButton btn) {

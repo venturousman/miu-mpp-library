@@ -1,5 +1,6 @@
 package business;
 
+import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -49,10 +50,23 @@ public class SystemController implements ControllerInterface {
     }
 
     @Override
+    public List<Checkout> allCheckouts() {
+        DataAccess da = new DataAccessFacade();
+        return new ArrayList<>(da.readCheckoutMap().values());
+    }
+
+    @Override
     public Book getBookById(String isbn) {
         DataAccess da = new DataAccessFacade();
         var books = da.readBooksMap();
         return books.get(isbn);
+    }
+
+    @Override
+    public LibraryMember getMemberById(String memberID) {
+        DataAccess da = new DataAccessFacade();
+        var members = da.readMemberMap();
+        return members.get(memberID);
     }
 
     @Override
@@ -73,5 +87,22 @@ public class SystemController implements ControllerInterface {
         Book book = new Book(newISBN, title, maxCheckoutLength, authors);
         DataAccess da = new DataAccessFacade();
         da.updateBook(oldISBN, book);
+    }
+
+    @Override
+    public void saveNewCheckout(String isbn, String memberID) {
+        DataAccess da = new DataAccessFacade();
+        LibraryMember member = getMemberById(memberID);
+        Book book = getBookById(isbn);
+        int maxCheckoutLength = book.getMaxCheckoutLength();
+        BookCopy bookCopy = book.getNextAvailableCopy();
+
+        // Get the current date
+        LocalDate currentDate = LocalDate.now();
+        // Add 5 days to the current date
+        LocalDate dueDate = currentDate.plusDays(maxCheckoutLength);
+
+        Checkout newCheckout = new Checkout(member, bookCopy, dueDate);
+        da.saveNewCheckout(newCheckout);
     }
 }

@@ -17,11 +17,17 @@ public interface ControllerInterface {
 
     public List<Book> allBooks();
 
+    public List<Checkout> allCheckouts();
+
     public Book getBookById(String isbn);
+
+    public LibraryMember getMemberById(String memberID);
 
     public void saveNewBook(String isbn, String title, int maxCheckoutLength, List<Author> authors);
 
     public void deleteBook(String isbn);
 
     public void updateBook(String oldISBN, String newISBN, String title, int maxCheckoutLength, List<Author> authors);
+
+    public void saveNewCheckout(String isbn, String memberID);
 }
