@@ -32,7 +32,6 @@ final public class Book implements Serializable {
             BookCopy c = copies[i];
             if (c.equals(copy)) {
                 copies[i] = copy;
-
             }
         }
     }
@@ -43,7 +42,6 @@ final public class Book implements Serializable {
             retVal.add(c.getCopyNum());
         }
         return retVal;
-
     }
 
     public void addCopy() {
@@ -52,7 +50,6 @@ final public class Book implements Serializable {
         newArr[copies.length] = new BookCopy(this, copies.length + 1, true);
         copies = newArr;
     }
-
 
     @Override
     public boolean equals(Object ob) {
@@ -125,5 +122,4 @@ final public class Book implements Serializable {
     public int getMaxCheckoutLength() {
         return maxCheckoutLength;
     }
-
 }
