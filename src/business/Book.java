@@ -32,7 +32,6 @@ final public class Book implements Serializable {
             BookCopy c = copies[i];
             if (c.equals(copy)) {
                 copies[i] = copy;
-
             }
         }
     }
@@ -43,7 +42,6 @@ final public class Book implements Serializable {
             retVal.add(c.getCopyNum());
         }
         return retVal;
-
     }
 
     public void addCopy() {
@@ -53,7 +51,6 @@ final public class Book implements Serializable {
         copies = newArr;
     }
 
-
     @Override
     public boolean equals(Object ob) {
         if (ob == null) return false;
@@ -61,7 +58,6 @@ final public class Book implements Serializable {
         Book b = (Book) ob;
         return b.isbn.equals(isbn);
     }
-
 
     public boolean isAvailable() {
         if (copies == null) {
@@ -93,6 +89,16 @@ final public class Book implements Serializable {
         return authors;
     }
 
+    public String getAuthorNames() {
+        if (authors == null || authors.isEmpty()) return null;
+        // Using Stream to filter and sort names
+        List<String> authorNames = authors.stream()
+                .map(Author::getFullName)  // Extract names
+                .sorted()                  // Sorting alphabetically
+                .toList();                 // Collecting results to a list
+        return String.join(",", authorNames);
+    }
+
     public String getIsbn() {
         return isbn;
     }
@@ -116,5 +122,4 @@ final public class Book implements Serializable {
     public int getMaxCheckoutLength() {
         return maxCheckoutLength;
     }
-
 }
