@@ -13,7 +13,7 @@ public class LoginMenuItemListener implements ActionListener {
     public void actionPerformed(ActionEvent e) {
         LibrarySystem.hideAllWindows();
         LoginWindow.INSTANCE.init();
-//        LoginWindow.INSTANCE.setSize(660, 500);
+        LoginWindow.INSTANCE.setSize(360, 300);
         Util.centerFrameOnDesktop(LoginWindow.INSTANCE);
         LoginWindow.INSTANCE.setVisible(true);
         LoginWindow.INSTANCE.setTitle("Login Window");
