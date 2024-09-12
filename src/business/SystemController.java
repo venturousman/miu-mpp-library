@@ -47,4 +47,31 @@ public class SystemController implements ControllerInterface {
         DataAccess da = new DataAccessFacade();
         return new ArrayList<>(da.readBooksMap().values());
     }
+
+    @Override
+    public Book getBookById(String isbn) {
+        DataAccess da = new DataAccessFacade();
+        var books = da.readBooksMap();
+        return books.get(isbn);
+    }
+
+    @Override
+    public void saveNewBook(String isbn, String title, int maxCheckoutLength, List<Author> authors) {
+        Book newBook = new Book(isbn, title, maxCheckoutLength, authors);
+        DataAccess da = new DataAccessFacade();
+        da.saveNewBook(newBook);
+    }
+
+    @Override
+    public void deleteBook(String isbn) {
+        DataAccess da = new DataAccessFacade();
+        da.deleteBook(isbn);
+    }
+
+    @Override
+    public void updateBook(String oldISBN, String newISBN, String title, int maxCheckoutLength, List<Author> authors) {
+        Book book = new Book(newISBN, title, maxCheckoutLength, authors);
+        DataAccess da = new DataAccessFacade();
+        da.updateBook(oldISBN, book);
+    }
 }

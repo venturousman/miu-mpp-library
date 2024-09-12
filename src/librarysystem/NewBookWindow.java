@@ -2,7 +2,8 @@ package librarysystem;
 
 import business.Author;
 import business.Book;
-import business.BookController;
+import business.ControllerInterface;
+import business.SystemController;
 
 import javax.swing.*;
 import javax.swing.border.Border;
@@ -20,8 +21,7 @@ import java.util.List;
 public class NewBookWindow extends JFrame implements LibWindow {
 
     public static final NewBookWindow INSTANCE = new NewBookWindow();
-    //    ControllerInterface ci = new SystemController();
-    BookController bookController = new BookController();
+    ControllerInterface ci = new SystemController();
 
     private boolean isInitialized = false;
     private JPanel mainPanel;
@@ -32,6 +32,7 @@ public class NewBookWindow extends JFrame implements LibWindow {
     private JTextField bookTitleTextField;
     private JTextField bookISBNTextField;
     private JTextField checkoutLengthTextField;
+    private JTable authorsTable;
 
     private JButton addBookButton;
     private JButton updateBookButton;
@@ -44,6 +45,9 @@ public class NewBookWindow extends JFrame implements LibWindow {
     private Border defaultBorder;
     private final String[] columnNames = {
             "ISBN", "Book Title", "Checkout Length", "Copies No.", "Author(s)"
+    };
+    private final String[] authorColumnNames = {
+            "First Name", "Last Name", "Telephone", "Short Bio"
     };
 
     private NewBookWindow() {
@@ -117,6 +121,17 @@ public class NewBookWindow extends JFrame implements LibWindow {
         leftPanel.add(checkoutLengthLabel);
         leftPanel.add(checkoutLengthTextField);
 
+        // table
+        JLabel authorLabel = new JLabel("Authors");
+        leftPanel.add(authorLabel);
+        JScrollPane scrollPane = new JScrollPane();
+        scrollPane.setPreferredSize(new Dimension(280, 50));
+        leftPanel.add(scrollPane);
+        authorsTable = new JTable();
+        authorsTable.setBackground(new Color(255, 255, 255));
+        scrollPane.setViewportView(authorsTable);
+        this.initAuthorTable(null);
+
         // buttons
         addBookButton = new JButton("Add");
         registerAddButtonListener(addBookButton);
@@ -175,7 +190,7 @@ public class NewBookWindow extends JFrame implements LibWindow {
 
     private void loadBooksToTable() {
         // load data
-        Collection<Book> books = bookController.getBooks();
+        var books = ci.allBooks();
 //        System.out.println(books);
 
         Object[][] items = new Object[books.size()][];
@@ -202,6 +217,20 @@ public class NewBookWindow extends JFrame implements LibWindow {
         };
 
         booksTable.setModel(tableModel);
+    }
+
+    private void initAuthorTable(Object[][] items) {
+//        Object[][] items = null;
+        // Creating a DefaultTableModel with isCellEditable() overridden to return false
+        DefaultTableModel tableModel = new DefaultTableModel(items, authorColumnNames) {
+            @Override
+            public boolean isCellEditable(int row, int column) {
+                // All cells are not editable
+                return true;
+            }
+        };
+
+        authorsTable.setModel(tableModel);
     }
 
     private void registerBackButtonListener(JButton btn) {
@@ -242,8 +271,8 @@ public class NewBookWindow extends JFrame implements LibWindow {
             bookISBNTextField.setBorder(redBorder);
             isValid = false;
         } else {
-//                bookISBNTextField.setBorder(defaultBorder);
-            boolean isExisted = bookController.isExisted(inputISBN);
+            var bookIds = ci.allBookIds();
+            boolean isExisted = bookIds.contains(inputISBN);
             if (isExisted && isAddingNew) {
                 bookISBNTextField.setBorder(redBorder);
                 isValid = false;
@@ -292,7 +321,7 @@ public class NewBookWindow extends JFrame implements LibWindow {
 
                 // TODO input authors
                 List<Author> authors = new ArrayList<>();
-                bookController.saveNewBook(inputISBN, inputTitle, checkoutLength, authors);
+                ci.saveNewBook(inputISBN, inputTitle, checkoutLength, authors);
                 JOptionPane.showMessageDialog(null, "Added Successfully");
                 // reload / re-render
                 loadBooksToTable();
@@ -312,12 +341,14 @@ public class NewBookWindow extends JFrame implements LibWindow {
             boolean isValid = true;
 
             String selectedISBN = booksTable.getValueAt(selectedRow, 0).toString();
-            if (selectedISBN.isEmpty() || !bookController.isExisted(selectedISBN)) {
+            var bookIds = ci.allBookIds();
+            boolean isExisted = bookIds.contains(selectedISBN);
+            if (selectedISBN.isEmpty() || !isExisted) {
                 isValid = false;
             }
 
             if (isValid) {
-                bookController.deleteBook(selectedISBN);
+                ci.deleteBook(selectedISBN);
                 JOptionPane.showMessageDialog(null, "Deleted Successfully");
                 // reload / re-render
                 loadBooksToTable();
@@ -335,7 +366,9 @@ public class NewBookWindow extends JFrame implements LibWindow {
             }
 
             String selectedISBN = booksTable.getValueAt(selectedRow, 0).toString();
-            if (selectedISBN.isEmpty() || !bookController.isExisted(selectedISBN)) {
+            var bookIds = ci.allBookIds();
+            boolean isExisted = bookIds.contains(selectedISBN);
+            if (selectedISBN.isEmpty() || !isExisted) {
                 return;
             }
 
@@ -349,7 +382,7 @@ public class NewBookWindow extends JFrame implements LibWindow {
 
                 // TODO updated authors
                 List<Author> authors = new ArrayList<>();
-                bookController.updateBook(selectedISBN, updatedISBN, updatedTitle, checkoutLength, authors);
+                ci.updateBook(selectedISBN, updatedISBN, updatedTitle, checkoutLength, authors);
 
                 JOptionPane.showMessageDialog(null, "Updated Successfully");
                 // reload / re-render
