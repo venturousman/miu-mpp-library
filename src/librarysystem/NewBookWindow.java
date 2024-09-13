@@ -17,8 +17,6 @@ import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.List;
-import java.util.stream.Collectors;
 
 public class NewBookWindow extends JFrame implements LibWindow {
 
@@ -67,8 +65,6 @@ public class NewBookWindow extends JFrame implements LibWindow {
         defineMiddlePanel();
         mainPanel.add(leftPanel, BorderLayout.WEST);
         mainPanel.add(middlePanel, BorderLayout.CENTER);
-//        mainPanel.add(leftPanel);
-//        mainPanel.add(middlePanel);
 
         getContentPane().add(mainPanel);
         isInitialized = true;
@@ -268,7 +264,10 @@ public class NewBookWindow extends JFrame implements LibWindow {
         } else {
             var bookIds = ci.allBookIds();
             boolean isExisted = bookIds.contains(inputISBN);
-            if (isExisted && isAddingNew) {
+            boolean isEqual = selectedISBN.equalsIgnoreCase(inputISBN); // don't change isbn
+            boolean updatingCheck = !isAddingNew && !isEqual && isExisted;
+            boolean addingCheck = isAddingNew && isExisted;
+            if (addingCheck || updatingCheck) {
                 bookISBNTextField.setBorder(redBorder);
                 isValid = false;
                 JOptionPane.showMessageDialog(null, "This isbn already exists!", "Error", JOptionPane.ERROR_MESSAGE);
