@@ -25,4 +25,8 @@ public interface DataAccess {
     public void updateBook(String isbn, Book book);
 
     public void updateBookCopyAvailability(String isbn, int copyNum);
+
+    public void deleteMember(String memberId);
+
+    public void updateMember(String memberId, LibraryMember member);
 }
