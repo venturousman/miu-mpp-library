@@ -113,7 +113,6 @@ public class SystemController implements ControllerInterface {
 
     @Override
     public void saveNewCheckout(String isbn, String memberID) {
-        DataAccess da = new DataAccessFacade();
         LibraryMember member = getMemberById(memberID);
         Book book = getBookById(isbn);
         if (book == null) return;
@@ -127,8 +126,13 @@ public class SystemController implements ControllerInterface {
         LocalDate dueDate = checkoutDate.plusDays(maxCheckoutLength);
 
         Checkout newCheckout = new Checkout(member, bookCopy, checkoutDate, dueDate);
+        DataAccess da = new DataAccessFacade();
         da.saveNewCheckout(newCheckout);
-        da.updateBookCopyAvailability(isbn, bookCopy.getCopyNum());
+//        da.updateBookCopyAvailability(isbn, bookCopy.getCopyNum());
+        // 2nd way:
+         bookCopy.changeAvailability();
+         book.updateCopies(bookCopy);
+         da.updateBook(isbn, book);
     }
 
     @Override
@@ -151,5 +155,14 @@ public class SystemController implements ControllerInterface {
     public void deleteMember(String memberID) {
         DataAccess da = new DataAccessFacade();
         da.deleteMember(memberID);
+    }
+
+    @Override
+    public void saveNewCopy(String isbn) {
+        Book book = getBookById(isbn);
+        if (book == null) return;
+        book.addCopy();
+        DataAccess da = new DataAccessFacade();
+        da.updateBook(isbn, book);
     }
 }
