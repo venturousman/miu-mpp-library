@@ -121,20 +121,20 @@ public class CheckoutBookWindow extends JFrame implements LibWindow {
         middlePanel.add(scrollPane);
 
         checkoutTable = new JTable();
-        checkoutTable.addMouseListener(new MouseAdapter() {
-            @Override
-            public void mouseClicked(MouseEvent e) {
-                int selectedRow = checkoutTable.getSelectedRow();
-                if (selectedRow >= 0) {
-//                    String selectedISBN = checkoutTable.getValueAt(selectedRow, 0).toString();
-//                    String selectedTitle = checkoutTable.getValueAt(selectedRow, 1).toString();
-//                    String selectedCheckoutLength = checkoutTable.getValueAt(selectedRow, 2).toString();
-//                    bookISBNTextField.setText(selectedISBN);
-//                    bookTitleTextField.setText(selectedTitle);
-//                    checkoutLengthTextField.setText(selectedCheckoutLength);
-                }
-            }
-        });
+//        checkoutTable.addMouseListener(new MouseAdapter() {
+//            @Override
+//            public void mouseClicked(MouseEvent e) {
+//                int selectedRow = checkoutTable.getSelectedRow();
+//                if (selectedRow >= 0) {
+////                    String selectedISBN = checkoutTable.getValueAt(selectedRow, 0).toString();
+////                    String selectedTitle = checkoutTable.getValueAt(selectedRow, 1).toString();
+////                    String selectedCheckoutLength = checkoutTable.getValueAt(selectedRow, 2).toString();
+////                    bookISBNTextField.setText(selectedISBN);
+////                    bookTitleTextField.setText(selectedTitle);
+////                    checkoutLengthTextField.setText(selectedCheckoutLength);
+//                }
+//            }
+//        });
         checkoutTable.setBackground(new Color(255, 255, 255));
 //        booksTable.setPreferredSize(new Dimension(900, 600));
         scrollPane.setViewportView(checkoutTable);
@@ -148,6 +148,7 @@ public class CheckoutBookWindow extends JFrame implements LibWindow {
         memberIdTextField.setBorder(defaultBorder);
         bookISBNTextField.setText("");
         bookISBNTextField.setBorder(defaultBorder);
+        checkoutTable.clearSelection();
     }
 
     private boolean validateForm() {
