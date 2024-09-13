@@ -19,6 +19,8 @@ public interface ControllerInterface {
 
     public List<Checkout> allCheckouts();
 
+    public List<Author> allAuthors();
+
     public Book getBookById(String isbn);
 
     public LibraryMember getMemberById(String memberID);

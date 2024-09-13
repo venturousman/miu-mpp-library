@@ -51,4 +51,17 @@ public class Person implements Serializable {
     public void setAddress(Address address) {
         this.address = address;
     }
+
+    @Override
+    public String toString() {
+        return getFullName();
+    }
+
+    @Override
+    public boolean equals(Object ob) {
+        if (ob == null) return false;
+        if (ob.getClass() != getClass()) return false;
+        Person p = (Person) ob;
+        return p.getFullName().equalsIgnoreCase(getFullName());
+    }
 }

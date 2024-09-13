@@ -4,6 +4,7 @@ import business.Author;
 import business.Book;
 import business.ControllerInterface;
 import business.SystemController;
+import librarysystem.components.MultiComboBox;
 
 import javax.swing.*;
 import javax.swing.border.Border;
@@ -15,8 +16,9 @@ import java.awt.event.KeyEvent;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.util.ArrayList;
-import java.util.Collection;
+import java.util.Arrays;
 import java.util.List;
+import java.util.stream.Collectors;
 
 public class NewBookWindow extends JFrame implements LibWindow {
 
@@ -32,12 +34,13 @@ public class NewBookWindow extends JFrame implements LibWindow {
     private JTextField bookTitleTextField;
     private JTextField bookISBNTextField;
     private JTextField checkoutLengthTextField;
-    private JTable authorsTable;
 
     private JButton addBookButton;
     private JButton updateBookButton;
     private JButton deleteBookButton;
     private JButton clearFormButton;
+
+    private MultiComboBox<Author> authorMultiComboBox;
 
     // Create the red border for invalid input
     private final Border redBorder = new LineBorder(Color.RED, 1);
@@ -45,9 +48,6 @@ public class NewBookWindow extends JFrame implements LibWindow {
     private Border defaultBorder;
     private final String[] columnNames = {
             "ISBN", "Book Title", "Checkout Length", "Copies No.", "Author(s)"
-    };
-    private final String[] authorColumnNames = {
-            "First Name", "Last Name", "Telephone", "Short Bio"
     };
 
     private NewBookWindow() {
@@ -121,16 +121,15 @@ public class NewBookWindow extends JFrame implements LibWindow {
         leftPanel.add(checkoutLengthLabel);
         leftPanel.add(checkoutLengthTextField);
 
-        // table
+        // combobox
         JLabel authorLabel = new JLabel("Authors");
         leftPanel.add(authorLabel);
-        JScrollPane scrollPane = new JScrollPane();
-        scrollPane.setPreferredSize(new Dimension(280, 50));
-        leftPanel.add(scrollPane);
-        authorsTable = new JTable();
-        authorsTable.setBackground(new Color(255, 255, 255));
-        scrollPane.setViewportView(authorsTable);
-        this.initAuthorTable(null);
+        var authors = ci.allAuthors().toArray(new Author[0]);
+//        System.out.println(authors);
+        authorMultiComboBox = new MultiComboBox<>(authors);
+        authorMultiComboBox.setPreferredSize(new Dimension(184, 30));
+        authorMultiComboBox.setEditable(false);
+        leftPanel.add(authorMultiComboBox);
 
         // buttons
         addBookButton = new JButton("Add");
@@ -177,6 +176,14 @@ public class NewBookWindow extends JFrame implements LibWindow {
 //                    bookISBNTextField.setEditable(false);
                     bookTitleTextField.setText(selectedTitle);
                     checkoutLengthTextField.setText(selectedCheckoutLength);
+                    // map authors
+                    var selectedAuthors = booksTable.getValueAt(selectedRow, 4).toString();
+                    var names = Arrays.asList(selectedAuthors.split(","));
+                    var authors = ci.allAuthors();
+                    var authorByNames = authors.stream()
+                            .filter(a -> names.contains(a.getFullName()))
+                            .toList();
+                    authorMultiComboBox.setSelectedItems(new ArrayList<>(authorByNames));
                 }
             }
         });
@@ -219,20 +226,6 @@ public class NewBookWindow extends JFrame implements LibWindow {
         booksTable.setModel(tableModel);
     }
 
-    private void initAuthorTable(Object[][] items) {
-//        Object[][] items = null;
-        // Creating a DefaultTableModel with isCellEditable() overridden to return false
-        DefaultTableModel tableModel = new DefaultTableModel(items, authorColumnNames) {
-            @Override
-            public boolean isCellEditable(int row, int column) {
-                // All cells are not editable
-                return true;
-            }
-        };
-
-        authorsTable.setModel(tableModel);
-    }
-
     private void registerBackButtonListener(JButton btn) {
         btn.addActionListener(evt -> {
             this.resetForm();
@@ -249,6 +242,8 @@ public class NewBookWindow extends JFrame implements LibWindow {
         bookTitleTextField.setBorder(defaultBorder);
         checkoutLengthTextField.setText(""); // "21"
         checkoutLengthTextField.setBorder(defaultBorder);
+        authorMultiComboBox.clearSelectedItems();
+        booksTable.clearSelection();
     }
 
     private boolean validateForm(String selectedISBN) {
@@ -289,7 +284,6 @@ public class NewBookWindow extends JFrame implements LibWindow {
             checkoutLengthTextField.setBorder(redBorder);
             isValid = false;
         } else {
-//                checkoutLengthTextField.setBorder(defaultBorder);
             // validate checkoutLength field is less than 21 days
             checkoutLength = Integer.parseInt(inputCheckoutLength);
             if (checkoutLength < 1 || checkoutLength > 21) {
@@ -299,6 +293,16 @@ public class NewBookWindow extends JFrame implements LibWindow {
                 checkoutLengthTextField.setBorder(defaultBorder);
             }
         }
+
+        // validate authors combobox
+        var authors = authorMultiComboBox.getSelectedValues();
+        if (authors == null || authors.isEmpty()) {
+            authorMultiComboBox.setBorder(redBorder);
+            isValid = false;
+        } else {
+            authorMultiComboBox.setBorder(defaultBorder);
+        }
+
         return isValid;
     }
 
@@ -318,10 +322,9 @@ public class NewBookWindow extends JFrame implements LibWindow {
                 String inputISBN = bookISBNTextField.getText().trim();
                 String inputCheckoutLength = checkoutLengthTextField.getText().trim();
                 int checkoutLength = Integer.parseInt(inputCheckoutLength);
-
-                // TODO input authors
-                List<Author> authors = new ArrayList<>();
-                ci.saveNewBook(inputISBN, inputTitle, checkoutLength, authors);
+                var inputAuthors = authorMultiComboBox.getSelectedValues();
+//                List<Author> inputAuthors = new ArrayList<>();
+                ci.saveNewBook(inputISBN, inputTitle, checkoutLength, inputAuthors);
                 JOptionPane.showMessageDialog(null, "Added Successfully");
                 // reload / re-render
                 loadBooksToTable();
@@ -379,11 +382,9 @@ public class NewBookWindow extends JFrame implements LibWindow {
                 String updatedTitle = bookTitleTextField.getText().trim();
                 String updatedCheckoutLength = checkoutLengthTextField.getText().trim();
                 int checkoutLength = Integer.parseInt(updatedCheckoutLength);
-
-                // TODO updated authors
-                List<Author> authors = new ArrayList<>();
-                ci.updateBook(selectedISBN, updatedISBN, updatedTitle, checkoutLength, authors);
-
+                var updatedAuthors = authorMultiComboBox.getSelectedValues();
+//                List<Author> updatedAuthors = new ArrayList<>();
+                ci.updateBook(selectedISBN, updatedISBN, updatedTitle, checkoutLength, updatedAuthors);
                 JOptionPane.showMessageDialog(null, "Updated Successfully");
                 // reload / re-render
                 loadBooksToTable();
