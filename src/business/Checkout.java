@@ -19,12 +19,12 @@ public final class Checkout implements Serializable {
 //        this.entries = entries;
 //    }
 
-    public Checkout(LibraryMember member, BookCopy bookCopy, LocalDate checkoutDate) {
+    public Checkout(LibraryMember member, BookCopy bookCopy, LocalDate checkoutDate, LocalDate dueDate) {
         // Generate a new UUID
         UUID uuid = UUID.randomUUID();
         this.checkoutId = uuid.toString();
         this.member = member;
-        this.entries = new CheckoutEntry[]{new CheckoutEntry(this, bookCopy, checkoutDate)};
+        this.entries = new CheckoutEntry[]{new CheckoutEntry(this, bookCopy, checkoutDate, dueDate)};
     }
 
     public CheckoutEntry[] getEntries() {
