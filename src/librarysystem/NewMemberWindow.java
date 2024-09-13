@@ -2,17 +2,9 @@ package librarysystem;
 
 import javax.swing.*;
 import java.awt.*;
-import java.io.FileOutputStream;
-import java.io.IOException;
-import java.io.ObjectOutputStream;
-import java.lang.reflect.Member;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
+import java.util.UUID;
 
 import business.Address;
-import business.Author;
-import business.Book;
 import business.LibraryMember;
 import dataaccess.DataAccessFacade;
 
@@ -24,7 +16,7 @@ public class NewMemberWindow extends JFrame implements LibWindow {
     private JPanel topPanel;
     private JPanel middlePanel;
 
-    // Text fields for member data
+
     private JTextField memberIdField;
     private JTextField firstNameField;
     private JTextField lastNameField;
@@ -73,6 +65,9 @@ public class NewMemberWindow extends JFrame implements LibWindow {
 
         // Add labels and text fields for each field
         memberIdField = createInputRow("Member ID:");
+        memberIdField.setEditable(false); // Make it un-editable
+        memberIdField.setText(generateUniqueMemberId()); // Set auto-generated ID
+
         firstNameField = createInputRow("First Name:");
         lastNameField = createInputRow("Last Name:");
         streetField = createInputRow("Street:");
@@ -106,9 +101,7 @@ public class NewMemberWindow extends JFrame implements LibWindow {
             String zip = zipField.getText();
             String telephone = telephoneField.getText();
 
-
             librarysystem.Member member = new librarysystem.Member(memberId, firstName, lastName, street, city, state, zip, telephone);
-
 
             saveMemberData();
 
@@ -126,15 +119,13 @@ public class NewMemberWindow extends JFrame implements LibWindow {
             DataAccessFacade da = new DataAccessFacade();
             da.saveNewMember(libraryMember);
 
-        }
-        catch (Exception e)
-        {
+        } catch (Exception e) {
             JOptionPane.showMessageDialog(this, "Error saving member data!", "Error", JOptionPane.ERROR_MESSAGE);
         }
     }
 
     private void clearFields() {
-        memberIdField.setText("");
+        memberIdField.setText(generateUniqueMemberId()); // Reset with new auto-generated ID
         firstNameField.setText("");
         lastNameField.setText("");
         streetField.setText("");
@@ -142,6 +133,11 @@ public class NewMemberWindow extends JFrame implements LibWindow {
         stateField.setText("");
         zipField.setText("");
         telephoneField.setText("");
+    }
+
+
+    private String generateUniqueMemberId() {
+        return UUID.randomUUID().toString();
     }
 
     private void addBackButtonListener(JButton btn) {
