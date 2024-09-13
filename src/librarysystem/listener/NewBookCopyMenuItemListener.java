@@ -14,10 +14,12 @@ public class NewBookCopyMenuItemListener implements ActionListener {
         LibrarySystem.hideAllWindows();
         if (!NewBookCopyWindow.INSTANCE.isInitialized()) {
             NewBookCopyWindow.INSTANCE.init();
-            NewBookCopyWindow.INSTANCE.setSize(660, 500);
+            NewBookCopyWindow.INSTANCE.setSize(600, 500);
             Util.centerFrameOnDesktop(NewBookCopyWindow.INSTANCE);
             NewBookCopyWindow.INSTANCE.setTitle("New Book Copy Window");
             NewBookCopyWindow.INSTANCE.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+        } else {
+            NewBookCopyWindow.INSTANCE.reloadData();
         }
         NewBookCopyWindow.INSTANCE.setVisible(true);
 //        NewBookCopyWindow.INSTANCE.repaint();  // Refresh the display

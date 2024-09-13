@@ -40,4 +40,6 @@ public interface ControllerInterface {
     public void updateMember(String oldMemberID, String newMemberID, String firstName, String lastName, String telephone, String street, String city, String state, String zip);
 
     public void deleteMember(String memberID);
+
+    public void saveNewCopy(String isbn);
 }

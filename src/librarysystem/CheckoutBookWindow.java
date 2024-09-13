@@ -274,4 +274,9 @@ public class CheckoutBookWindow extends JFrame implements LibWindow {
     public void isInitialized(boolean val) {
         isInitialized = val;
     }
+
+    @Override
+    public void reloadData() {
+        loadCheckoutsToTable();
+    }
 }

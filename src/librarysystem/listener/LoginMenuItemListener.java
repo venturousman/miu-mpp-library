@@ -18,6 +18,8 @@ public class LoginMenuItemListener implements ActionListener {
             Util.centerFrameOnDesktop(LoginWindow.INSTANCE);
             LoginWindow.INSTANCE.setTitle("Login Window");
             LoginWindow.INSTANCE.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+        } else {
+            LoginWindow.INSTANCE.reloadData();
         }
         LoginWindow.INSTANCE.setVisible(true);
 //        LoginWindow.INSTANCE.repaint();  // Refresh the display

@@ -18,6 +18,8 @@ public class CheckoutBookMenuItemListener implements ActionListener {
             Util.centerFrameOnDesktop(CheckoutBookWindow.INSTANCE);
             CheckoutBookWindow.INSTANCE.setTitle("Checkout Book Window");
             CheckoutBookWindow.INSTANCE.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+        } else {
+            CheckoutBookWindow.INSTANCE.reloadData();
         }
         CheckoutBookWindow.INSTANCE.setVisible(true);
 //        CheckoutBookWindow.INSTANCE.repaint();  // Refresh the display
