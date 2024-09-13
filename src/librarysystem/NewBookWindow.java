@@ -264,8 +264,7 @@ public class NewBookWindow extends JFrame implements LibWindow {
         } else {
             var bookIds = ci.allBookIds();
             boolean isExisted = bookIds.contains(inputISBN);
-            boolean isEqual = selectedISBN.equalsIgnoreCase(inputISBN); // don't change isbn
-            boolean updatingCheck = !isAddingNew && !isEqual && isExisted;
+            boolean updatingCheck = !isAddingNew && !selectedISBN.equalsIgnoreCase(inputISBN) && isExisted;
             boolean addingCheck = isAddingNew && isExisted;
             if (addingCheck || updatingCheck) {
                 bookISBNTextField.setBorder(redBorder);

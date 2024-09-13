@@ -62,7 +62,7 @@ public class DataAccessFacade implements DataAccess {
     public void updateBook(String isbn, Book book) {
         HashMap<String, Book> books = readBooksMap();
         String bookId = book.getIsbn();
-        if (bookId.equals(isbn)) {
+        if (bookId.equalsIgnoreCase(isbn)) {
             books.replace(isbn, book);
         } else {
             books.remove(isbn);
