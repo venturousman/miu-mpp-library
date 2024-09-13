@@ -11,6 +11,8 @@ public interface ControllerInterface {
 
     public void logout();
 
+    public List<LibraryMember> allMembers();
+
     public List<String> allMemberIds();
 
     public List<String> allBookIds();
@@ -32,4 +34,10 @@ public interface ControllerInterface {
     public void updateBook(String oldISBN, String newISBN, String title, int maxCheckoutLength, List<Author> authors);
 
     public void saveNewCheckout(String isbn, String memberID);
+
+    public void saveNewMember(String memberID, String firstName, String lastName, String telephone, String street, String city, String state, String zip);
+
+    public void updateMember(String oldMemberID, String newMemberID, String firstName, String lastName, String telephone, String street, String city, String state, String zip);
+
+    public void deleteMember(String memberID);
 }

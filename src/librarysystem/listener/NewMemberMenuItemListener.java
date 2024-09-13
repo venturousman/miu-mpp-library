@@ -14,7 +14,7 @@ public class NewMemberMenuItemListener implements ActionListener {
         LibrarySystem.hideAllWindows();
         if (!NewMemberWindow.INSTANCE.isInitialized()) {
             NewMemberWindow.INSTANCE.init();
-            NewMemberWindow.INSTANCE.setSize(660, 500);
+            NewMemberWindow.INSTANCE.setSize(1200, 630);
             Util.centerFrameOnDesktop(NewMemberWindow.INSTANCE);
             NewMemberWindow.INSTANCE.setTitle("New Member Window");
             NewMemberWindow.INSTANCE.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);

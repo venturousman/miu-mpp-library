@@ -81,4 +81,10 @@ public class Util {
         String pattern = "\\d{2}-\\d{5}";
         return isbn.matches(pattern);
     }
+
+    public static boolean isValidTelephone(String telephone) {
+        // 702-998-2414
+        String pattern = "\\d{3}-\\d{3}-\\d{4}";
+        return telephone.matches(pattern);
+    }
 }

@@ -32,6 +32,12 @@ public class SystemController implements ControllerInterface {
     }
 
     @Override
+    public List<LibraryMember> allMembers() {
+        DataAccess da = new DataAccessFacade();
+        return new ArrayList<>(da.readMemberMap().values());
+    }
+
+    @Override
     public List<String> allMemberIds() {
         DataAccess da = new DataAccessFacade();
         return new ArrayList<>(da.readMemberMap().keySet());
@@ -123,5 +129,27 @@ public class SystemController implements ControllerInterface {
         Checkout newCheckout = new Checkout(member, bookCopy, checkoutDate);
         da.saveNewCheckout(newCheckout);
         da.updateBookCopyAvailability(isbn, bookCopy.getCopyNum());
+    }
+
+    @Override
+    public void saveNewMember(String memberID, String firstName, String lastName, String telephone, String street, String city, String state, String zip) {
+        var address = new Address(street, city, state, zip);
+        var member = new LibraryMember(memberID, firstName, lastName, telephone, address);
+        DataAccess da = new DataAccessFacade();
+        da.saveNewMember(member);
+    }
+
+    @Override
+    public void updateMember(String oldMemberID, String newMemberID, String firstName, String lastName, String telephone, String street, String city, String state, String zip) {
+        var address = new Address(street, city, state, zip);
+        var member = new LibraryMember(newMemberID, firstName, lastName, telephone, address);
+        DataAccess da = new DataAccessFacade();
+        da.updateMember(oldMemberID, member);
+    }
+
+    @Override
+    public void deleteMember(String memberID) {
+        DataAccess da = new DataAccessFacade();
+        da.deleteMember(memberID);
     }
 }

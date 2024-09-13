@@ -82,6 +82,26 @@ public class DataAccessFacade implements DataAccess {
         }
     }
 
+    @Override
+    public void deleteMember(String memberId) {
+        HashMap<String, LibraryMember> members = readMemberMap();
+        members.remove(memberId);
+        saveToStorage(StorageType.MEMBERS, members);
+    }
+
+    @Override
+    public void updateMember(String memberId, LibraryMember member) {
+        HashMap<String, LibraryMember> members = readMemberMap();
+        String newMemberId = member.getMemberId();
+        if (newMemberId.equalsIgnoreCase(memberId)) {
+            members.replace(memberId, member);
+        } else {
+            members.remove(memberId);
+            members.put(newMemberId, member);
+        }
+        saveToStorage(StorageType.MEMBERS, members);
+    }
+
     @SuppressWarnings("unchecked")
     public HashMap<String, Book> readBooksMap() {
         //Returns a Map with name/value pairs being isbn -> Book
