@@ -111,16 +111,16 @@ public class SystemController implements ControllerInterface {
         LibraryMember member = getMemberById(memberID);
         Book book = getBookById(isbn);
         if (book == null) return;
-//        int maxCheckoutLength = book.getMaxCheckoutLength();
+        int maxCheckoutLength = book.getMaxCheckoutLength();
         BookCopy bookCopy = book.getNextAvailableCopy();
         if (bookCopy == null) return;
 
         // Get the current date
         LocalDate checkoutDate = LocalDate.now();
         // Add N days to the current date
-//        LocalDate dueDate = checkoutDate.plusDays(maxCheckoutLength);
+        LocalDate dueDate = checkoutDate.plusDays(maxCheckoutLength);
 
-        Checkout newCheckout = new Checkout(member, bookCopy, checkoutDate);
+        Checkout newCheckout = new Checkout(member, bookCopy, checkoutDate, dueDate);
         da.saveNewCheckout(newCheckout);
         da.updateBookCopyAvailability(isbn, bookCopy.getCopyNum());
     }
