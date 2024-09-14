@@ -18,6 +18,8 @@ public class NewMemberMenuItemListener implements ActionListener {
             Util.centerFrameOnDesktop(NewMemberWindow.INSTANCE);
             NewMemberWindow.INSTANCE.setTitle("New Member Window");
             NewMemberWindow.INSTANCE.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+        } else {
+            NewMemberWindow.INSTANCE.reloadData();
         }
         NewMemberWindow.INSTANCE.setVisible(true);
 //        NewMemberWindow.INSTANCE.repaint();

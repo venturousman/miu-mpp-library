@@ -171,4 +171,9 @@ public class LoginWindow extends JFrame implements LibWindow {
             }
         });
     }
+
+    @Override
+    public void reloadData() {
+
+    }
 }

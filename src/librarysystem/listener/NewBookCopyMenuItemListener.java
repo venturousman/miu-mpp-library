@@ -18,6 +18,8 @@ public class NewBookCopyMenuItemListener implements ActionListener {
             Util.centerFrameOnDesktop(NewBookCopyWindow.INSTANCE);
             NewBookCopyWindow.INSTANCE.setTitle("New Book Copy Window");
             NewBookCopyWindow.INSTANCE.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+        } else {
+            NewBookCopyWindow.INSTANCE.reloadData();
         }
         NewBookCopyWindow.INSTANCE.setVisible(true);
 //        NewBookCopyWindow.INSTANCE.repaint();  // Refresh the display

@@ -19,6 +19,8 @@ public class NewBookMenuItemListener implements ActionListener {
             Util.centerFrameOnDesktop(NewBookWindow.INSTANCE);
             NewBookWindow.INSTANCE.setTitle("New Book Window");
             NewBookWindow.INSTANCE.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+        } else {
+            NewBookWindow.INSTANCE.reloadData();
         }
         NewBookWindow.INSTANCE.setVisible(true);
 //        NewBookWindow.INSTANCE.repaint();  // Refresh the display
