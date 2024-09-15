@@ -61,21 +61,21 @@ public class SystemController implements ControllerInterface {
         return new ArrayList<>(da.readCheckoutMap().values());
     }
 
-    @Override
-    public List<Author> allAuthors() {
-        DataAccess da = new DataAccessFacade();
-        var books = da.readBooksMap().values();
-        List<Author> authors = new ArrayList<>();
-        for (Book book : books) {
-            var bookAuthors = book.getAuthors();
-            for (Author author : bookAuthors) {
-                if (!authors.contains(author)) {
-                    authors.add(author);
-                }
-            }
-        }
-        return authors;
-    }
+//    @Override
+//    public List<Author> allAuthors() {
+//        DataAccess da = new DataAccessFacade();
+//        var books = da.readBooksMap().values();
+//        List<Author> authors = new ArrayList<>();
+//        for (Book book : books) {
+//            var bookAuthors = book.getAuthors();
+//            for (Author author : bookAuthors) {
+//                if (!authors.contains(author)) {
+//                    authors.add(author);
+//                }
+//            }
+//        }
+//        return authors;
+//    }
 
     @Override
     public Book getBookById(String isbn) {

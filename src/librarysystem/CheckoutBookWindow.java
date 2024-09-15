@@ -9,8 +9,6 @@ import javax.swing.table.DefaultTableModel;
 import java.awt.*;
 import java.awt.event.KeyAdapter;
 import java.awt.event.KeyEvent;
-import java.awt.event.MouseAdapter;
-import java.awt.event.MouseEvent;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 
@@ -35,7 +33,7 @@ public class CheckoutBookWindow extends JFrame implements LibWindow {
     // Create the default border to reset later
     private Border defaultBorder;
     private final String[] columnNames = {
-            "Due Date", "Checkout Date", "Member", "Book ISBN", "Book Title",
+            "Checkout Date", "Due Date", "Member Id", "Member Name", "Copy No", "Book ISBN", "Book Title",
     };
 
     private CheckoutBookWindow() {
@@ -62,7 +60,7 @@ public class CheckoutBookWindow extends JFrame implements LibWindow {
     private void defineLeftPanel() {
         leftPanel = new JPanel();
         leftPanel.setLayout(new FlowLayout(FlowLayout.LEFT, 20, 8));
-        leftPanel.setPreferredSize(new Dimension(300, 600));
+        leftPanel.setPreferredSize(new Dimension(280, 600));
 
         // Get the current date
         LocalDate currentDate = LocalDate.now();
@@ -117,7 +115,7 @@ public class CheckoutBookWindow extends JFrame implements LibWindow {
         middlePanel.setLayout(fl);
 
         JScrollPane scrollPane = new JScrollPane();
-        scrollPane.setPreferredSize(new Dimension(850, 540));
+        scrollPane.setPreferredSize(new Dimension(880, 540));
         middlePanel.add(scrollPane);
 
         checkoutTable = new JTable();
@@ -140,7 +138,7 @@ public class CheckoutBookWindow extends JFrame implements LibWindow {
         scrollPane.setViewportView(checkoutTable);
 
         // load data
-        loadCheckoutsToTable();
+        loadDataToTable();
     }
 
     private void resetForm() {
@@ -202,7 +200,6 @@ public class CheckoutBookWindow extends JFrame implements LibWindow {
     private void registerCheckoutButtonListener(JButton btn) {
         btn.addActionListener(evt -> {
             boolean isValid = validateForm();
-
             if (isValid) {
                 // save checkout
                 String inputMemberID = memberIdTextField.getText().trim();
@@ -210,15 +207,15 @@ public class CheckoutBookWindow extends JFrame implements LibWindow {
                 ci.saveNewCheckout(inputISBN, inputMemberID);
                 JOptionPane.showMessageDialog(null, "Checked-out Successfully");
                 // reload / re-render
-                loadCheckoutsToTable();
+                loadDataToTable();
                 resetForm();
             }
         });
     }
 
-    private void loadCheckoutsToTable() {
+    private void loadDataToTable() {
         var checkouts = ci.allCheckouts();
-        System.out.println(checkouts);
+//        System.out.println(checkouts);
 
         // sum entries
         int sum = 0;
@@ -232,13 +229,18 @@ public class CheckoutBookWindow extends JFrame implements LibWindow {
         for (Checkout checkout : checkouts) {
             var entries = checkout.getEntries();
             if (entries != null) {
+                var member = checkout.getMember();
                 for (CheckoutEntry entry : checkout.getEntries()) {
+                    var bookCopy = entry.getBookCopy();
+                    var book = bookCopy.getBook();
                     Object[] item = new Object[]{
-                            entry.getDueDate(),
                             entry.getCheckoutDate(),
-                            checkout.getMember().getFullName(),
-                            entry.getBookCopy().getBook().getIsbn(),
-                            entry.getBookCopy().getBook().getTitle(),
+                            entry.getDueDate(),
+                            member.getMemberId(),
+                            member.getFullName(),
+                            bookCopy.getCopyNum(),
+                            book.getIsbn(),
+                            book.getTitle(),
                     };
                     items[i++] = item;
                 }
@@ -277,6 +279,6 @@ public class CheckoutBookWindow extends JFrame implements LibWindow {
 
     @Override
     public void reloadData() {
-        loadCheckoutsToTable();
+        loadDataToTable();
     }
 }

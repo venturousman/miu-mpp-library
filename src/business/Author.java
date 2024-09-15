@@ -4,15 +4,15 @@ import java.io.Serializable;
 
 final public class Author extends Person implements Serializable {
     private String bio;
-    private Boolean credentials; // Author is expert in that area and having qualification
+//    private Boolean credentials; // Author is expert in that area and having qualification
 
     public String getBio() {
         return bio;
     }
 
-    public Boolean getCredentials() {
-        return credentials;
-    }
+//    public Boolean getCredentials() {
+//        return credentials;
+//    }
 
     public Author(String f, String l, String t, Address a, String bio) {
         super(f, l, t, a);
