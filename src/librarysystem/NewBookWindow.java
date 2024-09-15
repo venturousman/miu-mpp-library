@@ -186,9 +186,20 @@ public class NewBookWindow extends JFrame implements LibWindow, PopupCallback {
         JScrollPane scrollPane = new JScrollPane();
         scrollPane.setPreferredSize(new Dimension(800, 540));
 //        scrollPane.setBounds(6, 154, 582, 287);
+        scrollPane.setHorizontalScrollBarPolicy(JScrollPane.HORIZONTAL_SCROLLBAR_AS_NEEDED);
+        scrollPane.setVerticalScrollBarPolicy(JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED);
         middlePanel.add(scrollPane);
 
-        booksTable = new JTable();
+        // Creating a DefaultTableModel with isCellEditable() overridden to return false
+        DefaultTableModel tableModel = new DefaultTableModel(null, columnNames) {
+            @Override
+            public boolean isCellEditable(int row, int column) {
+                // All cells are not editable
+                return false;
+            }
+        };
+
+        booksTable = new JTable(tableModel);
         booksTable.addMouseListener(new MouseAdapter() {
             @Override
             public void mouseClicked(MouseEvent e) {
@@ -208,6 +219,14 @@ public class NewBookWindow extends JFrame implements LibWindow, PopupCallback {
         });
         booksTable.setBackground(new Color(255, 255, 255));
 //        booksTable.setPreferredSize(new Dimension(900, 600));
+        booksTable.setAutoResizeMode(JTable.AUTO_RESIZE_OFF); // Disable auto-resizing
+        // Set the width of the first column ("Name") to 150 pixels
+        booksTable.getColumnModel().getColumn(0).setPreferredWidth(80);
+        booksTable.getColumnModel().getColumn(1).setPreferredWidth(250);
+        booksTable.getColumnModel().getColumn(2).setPreferredWidth(120);
+        booksTable.getColumnModel().getColumn(3).setPreferredWidth(80);
+        booksTable.getColumnModel().getColumn(4).setPreferredWidth(250);
+
         scrollPane.setViewportView(booksTable);
 
         // load data
@@ -219,9 +238,9 @@ public class NewBookWindow extends JFrame implements LibWindow, PopupCallback {
         var books = ci.allBooks();
 //        System.out.println(books);
 
-        Object[][] items = new Object[books.size()][];
+        DefaultTableModel model = (DefaultTableModel) booksTable.getModel();
+        model.setRowCount(0); // This clears all rows
 
-        int i = 0;
         for (Book book : books) {
             Object[] item = new Object[]{
                     book.getIsbn(),
@@ -230,19 +249,8 @@ public class NewBookWindow extends JFrame implements LibWindow, PopupCallback {
                     book.getNumCopies(),
                     book.getAuthorNames(),
             };
-            items[i++] = item;
+            model.addRow(item);
         }
-
-        // Creating a DefaultTableModel with isCellEditable() overridden to return false
-        DefaultTableModel tableModel = new DefaultTableModel(items, columnNames) {
-            @Override
-            public boolean isCellEditable(int row, int column) {
-                // All cells are not editable
-                return false;
-            }
-        };
-
-        booksTable.setModel(tableModel);
     }
 
     private void loadAuthorsToTable(String isbn) {
@@ -250,12 +258,9 @@ public class NewBookWindow extends JFrame implements LibWindow, PopupCallback {
         var book = ci.getBookById(isbn);
         var bookAuthors = book.getAuthors();
 //        System.out.println(bookAuthors);
-//        int len = bookAuthors.size();
-//        Object[][] items = new Object[len][];
 
         DefaultTableModel model = (DefaultTableModel) authorsTable.getModel();
         model.setRowCount(0); // This clears all rows
-//        int i = 0;
         for (Author a : bookAuthors) {
             var address = a.getAddress();
             Object[] item = new Object[]{
@@ -270,27 +275,14 @@ public class NewBookWindow extends JFrame implements LibWindow, PopupCallback {
                     address.getState(),
                     address.getZip()
             };
-//            items[i++] = item;
             model.addRow(item);
         }
-
-//        // Creating a DefaultTableModel with isCellEditable() overridden to return false
-//        DefaultTableModel tableModel = new DefaultTableModel(items, authorColumnNames) {
-//            @Override
-//            public boolean isCellEditable(int row, int column) {
-//                // All cells are not editable
-//                return false;
-//            }
-//        };
-//
-//        authorsTable.setModel(tableModel);
     }
 
     private List<Author> getAuthorsFromTable() {
-        // "First Name", "Last Name", "Telephone", "Bio", "Street", "City", "State", "Zip"
         List<Author> authors = new ArrayList<>();
         DefaultTableModel model = (DefaultTableModel) authorsTable.getModel();
-        int column = 1; // firstName column is 1
+        int column = 1; // firstName column is 1, 0 is delete button
         // Loop through all rows of the table
         for (int row = 0; row < model.getRowCount(); row++) {
             String firstName = authorsTable.getValueAt(row, column).toString();
@@ -309,11 +301,6 @@ public class NewBookWindow extends JFrame implements LibWindow, PopupCallback {
     }
 
     private void deleteAuthorRow() {
-//        ButtonEditor editor = (ButtonEditor) authorsTable.getCellEditor();
-//        int selectedRow = editor.getCurrentRow();
-//        DefaultTableModel model = (DefaultTableModel) authorsTable.getModel();
-//        model.removeRow(selectedRow); // Remove the selected row
-//        JOptionPane.showMessageDialog(null, "Row " + selectedRow + " deleted");
         if (authorsTable.isEditing()) {
             authorsTable.getCellEditor().stopCellEditing();
         }
@@ -322,7 +309,7 @@ public class NewBookWindow extends JFrame implements LibWindow, PopupCallback {
         if (selectedRow >= 0 && selectedRow < model.getRowCount()) {
             model.removeRow(selectedRow); // Remove the selected row
         }
-        JOptionPane.showMessageDialog(null, "Row " + selectedRow + " deleted");
+//        JOptionPane.showMessageDialog(null, "Row " + selectedRow + " deleted");
     }
 
     private void registerBackButtonListener(JButton btn) {
@@ -424,14 +411,12 @@ public class NewBookWindow extends JFrame implements LibWindow, PopupCallback {
     private void registerAddButtonListener(JButton btn) {
         btn.addActionListener(evt -> {
             boolean isValid = validateForm(null);
-
             if (isValid) {
                 // save book
                 String inputTitle = bookTitleTextField.getText().trim();
                 String inputISBN = bookISBNTextField.getText().trim();
                 String inputCheckoutLength = checkoutLengthTextField.getText().trim();
                 int checkoutLength = Integer.parseInt(inputCheckoutLength);
-//                var inputAuthors = authorMultiComboBox.getSelectedValues();
                 // get authors from the table
                 List<Author> inputAuthors = getAuthorsFromTable();
 //                List<Author> inputAuthors = new ArrayList<>();
@@ -493,7 +478,6 @@ public class NewBookWindow extends JFrame implements LibWindow, PopupCallback {
                 String updatedTitle = bookTitleTextField.getText().trim();
                 String updatedCheckoutLength = checkoutLengthTextField.getText().trim();
                 int checkoutLength = Integer.parseInt(updatedCheckoutLength);
-//                var updatedAuthors = authorMultiComboBox.getSelectedValues();
                 // get authors from the table and update
                 List<Author> updatedAuthors = getAuthorsFromTable();
 //                List<Author> updatedAuthors = new ArrayList<>();
